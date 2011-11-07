@@ -31,7 +31,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
@@ -56,10 +55,12 @@ public class TimerServicePersistenceSecondTestCase {
     @Test
     @Ignore("AS7-2168 -- Disabled because failing")
     public void testTimerServiceCalled() throws NamingException {
-        InitialContext ctx = new InitialContext();
         Assert.assertTrue(SimpleTimerServiceBean.awaitTimerCall());
     }
 
-
+    @Test
+    public void testTimerServiceCalledNoRepeat() throws NamingException {
+        Assert.assertTrue(SimpleTimerSLSBeanNoRepeat.timerServiceCalled);
+    }
 
 }

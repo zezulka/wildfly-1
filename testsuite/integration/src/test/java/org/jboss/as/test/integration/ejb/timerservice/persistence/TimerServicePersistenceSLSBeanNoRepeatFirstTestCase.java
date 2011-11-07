@@ -26,22 +26,26 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
+import org.junit.AfterClass;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
- * Two phase test for timer serialization. This test case creates a persistent timer, and the second phase restores it.
- *
- * @author Stuart Douglas
+ * Testcase for EJBTHREE-1926 https://jira.jboss.org/jira/browse/EJBTHREE-1926
+ * The bug was caused by restoring the timers too early during the EJB3 container
+ * startup (in the stateless/service container lockedStart()).
+ * 
+ * The fix involved restoring the timers after the containers have started
+ * and are ready to accept invocations.
+ * 
+ * 
+ * @author Jaikiran Pai, Ondrej Chaloupka
  */
 @RunWith(Arquillian.class)
-@Ignore("AS7-2441")
-public class TimerServicePersistenceFirstTestCase {
+public class TimerServicePersistenceSLSBeanNoRepeatFirstTestCase {
 
     /**
      * must match between the two tests.
@@ -51,17 +55,23 @@ public class TimerServicePersistenceFirstTestCase {
     @Deployment
     public static Archive<?> deploy() {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, ARCHIVE_NAME);
-        war.addPackage(TimerServicePersistenceFirstTestCase.class.getPackage());
+        war.addPackage(TimerServicePersistenceSLSBeanNoRepeatFirstTestCase.class.getPackage());
         return war;
 
+    }
+    
+    @AfterClass
+    public static void waiting() throws Exception {
+        // waiting between deployments
+        Thread.sleep(1100);
+        System.out.println("Waiting");
     }
 
     @Test
     public void createTimerService() throws NamingException {
         InitialContext ctx = new InitialContext();
-        SimpleTimerServiceBean bean = (SimpleTimerServiceBean)ctx.lookup("java:module/" + SimpleTimerServiceBean.class.getSimpleName());
-        bean.createTimer();
-        Assert.assertTrue(SimpleTimerServiceBean.awaitTimerCall());
+        SimpleTimerSLSBeanNoRepeat bean = (SimpleTimerSLSBeanNoRepeat)ctx.lookup("java:module/" + SimpleTimerSLSBeanNoRepeat.class.getSimpleName());
+        bean.createTimer(1000);
     }
 
 
