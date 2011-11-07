@@ -40,7 +40,7 @@ public class FirstInterceptor {
         Assert.assertFalse(InterceptorChild.childPostConstructCalled);
         Assert.assertFalse(LastInterceptor.postConstructCalled);
         Assert.assertFalse(SFSBParent.parentPostConstructCalled);
-        Assert.assertFalse(SFSBChild.childPostConstructCalled);
+        // Assert.assertFalse(SFSBChild.childPostConstructCalled);
         ctx.proceed();
     }
 

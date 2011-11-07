@@ -22,27 +22,28 @@
 package org.jboss.as.test.integration.ejb.interceptor.lifecycle.order;
 
 import javax.annotation.PostConstruct;
-import javax.interceptor.InvocationContext;
+import javax.ejb.Stateful;
 
 import org.junit.Assert;
 
 /**
- * @author Stuart Douglas
+ * Migrated from EJB3 testsuite [JBQA-5451] from test ejbthree1852
+ * @author Stuart Douglas, Ondrej Chaloupka
  */
-public class LastInterceptor {
+@Stateful
+public class SFSBChildDescriptor extends SFSBParent {
 
-    public static boolean postConstructCalled;
+    public static boolean childPostConstructCalled = false;
 
     @PostConstruct
-    public void child(InvocationContext ctx) throws Exception{
-        postConstructCalled = true;
+    public void child() {
+        childPostConstructCalled = true;
+        Assert.assertTrue(SFSBParent.parentPostConstructCalled);
         Assert.assertTrue(InterceptorParent.parentPostConstructCalled);
-        Assert.assertTrue(InterceptorChild.childPostConstructCalled);
-        Assert.assertTrue(FirstInterceptor.postConstructCalled);
-        Assert.assertFalse(SFSBParent.parentPostConstructCalled);
-        // Assert.assertFalse(SFSBChild.childPostConstructCalled);
-        ctx.proceed();
+        // Assert.assertTrue(InterceptorChild.childPostConstructCalled);
     }
 
+    public void doStuff() {
+    }
 
 }
