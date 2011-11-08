@@ -32,16 +32,13 @@ import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBAccessException;
-import javax.naming.InitialContext;
 import javax.security.auth.login.LoginContext;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.test.integration.common.HttpRequest;
 import org.jboss.as.test.integration.ejb.security.base.WhoAmIBean;
-import org.jboss.as.test.integration.ejb.security.runas.CallerPrincipalNotAvailableException;
 import org.jboss.as.test.integration.ejb.security.runas.EntryBean;
-import org.jboss.as.test.integration.ejb.security.runas.SLSBWithoutSecurityDomain;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -96,19 +93,6 @@ public class RunAsTestCase extends SecurityTest {
         return war;
     }
     
-
-    @Test
-    public void testWithoutSecurityDomain() throws Exception {
-        SLSBWithoutSecurityDomain bean = (SLSBWithoutSecurityDomain) new InitialContext().lookup("java:module/"
-                + SLSBWithoutSecurityDomain.class.getSimpleName());
-        try {
-            Principal principal = bean.getCallerPrincipal();
-            fail("Caller principal was *not* associated, but no CallerPrincipalNotAvailableException was thrown. Was returned: " + principal);
-        } catch (CallerPrincipalNotAvailableException cpnae) {
-            // expected, since when no caller principal is associated an IllegalStateException is thrown
-        }
-    }
-
     @Test
     public void testAuthentication_TwoBeans() throws Exception {
         LoginContext lc = Util.getCLMLoginContext("user1", "password1");

@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBAccessException;
+import javax.naming.InitialContext;
 import javax.security.auth.login.LoginContext;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -87,6 +88,7 @@ public class AuthenticationTestCase extends SecurityTest {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, "ejb3security.war")
                 .addPackage(WhoAmIBean.class.getPackage()).addPackage(EntryBean.class.getPackage())
                 .addPackage(HttpRequest.class.getPackage()).addClass(WhoAmI.class).addClass(Util.class).addClass(Entry.class)
+                .addClass(SLSBWithoutSecurityDomain.class)
                 .addClass(WhoAmIServlet.class).addClass(AuthenticationTestCase.class).addClass(Base64.class)
                 .addClass(SecurityTest.class).addAsResource("ejb3/security/users.properties", "users.properties")
                 .addAsResource("ejb3/security/roles.properties", "roles.properties")
@@ -204,6 +206,23 @@ public class AuthenticationTestCase extends SecurityTest {
                     + e.getMessage() + ")");
         }
     }
+    
+    @Test
+    public void testUnauthenticatedNoSecurityDomain() throws Exception {
+        try {
+            SLSBWithoutSecurityDomain bean = (SLSBWithoutSecurityDomain) new InitialContext().lookup("java:module/" + SLSBWithoutSecurityDomain.class.getSimpleName());
+            final Principal principal = bean.getCallerPrincipal();
+            assertNotNull("EJB 3.1 FR 17.6.5 The container must never return a null from the getCallerPrincipal method.",
+                    principal);
+            // TODO: where is 'anonymous' configured?
+            assertEquals("anonymous", principal.getName());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            fail("EJB 3.1 FR 17.6.5 The EJB container must provide the caller’s security context information during the execution of a business method ("
+                    + e.getMessage() + ")");
+        }
+    }
+
 
     @Test
     public void testAuthentication_ViaServlet() throws Exception {

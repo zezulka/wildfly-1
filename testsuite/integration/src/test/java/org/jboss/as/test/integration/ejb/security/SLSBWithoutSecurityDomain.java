@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.integration.ejb.security.runas;
+package org.jboss.as.test.integration.ejb.security;
 
 import java.security.Principal;
 
@@ -28,9 +28,9 @@ import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 
 /**
- * SessionBeanWithoutSecurityDomain
+ * SessionBeanWithoutSecurityDomain - testing getCallerPrincipal() method
  * 
- * @author Jaikiran Pai
+ * @author Jaikiran Pai, Ondrej Chaloupka
  */
 @Stateless
 public class SLSBWithoutSecurityDomain {
@@ -40,15 +40,10 @@ public class SLSBWithoutSecurityDomain {
     /**
      * {@inheritDoc}
      */
-    public Principal getCallerPrincipal() throws CallerPrincipalNotAvailableException {
+    public Principal getCallerPrincipal() {
         // as per the API, the getCallerPrincipal never returns null.
-        // if there is no principal associated then an IllegalStateException is thrown
-        try {
-            return this.sessContext.getCallerPrincipal();
-        } catch (IllegalStateException ise) {
-            throw new CallerPrincipalNotAvailableException();
-        }
-
+        // if there is no principal associated then 'anonymous' role is returned
+        return this.sessContext.getCallerPrincipal();
     }
 
 }
