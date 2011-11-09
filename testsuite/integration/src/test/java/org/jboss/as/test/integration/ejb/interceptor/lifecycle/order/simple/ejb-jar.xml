@@ -6,12 +6,14 @@
          <interceptor-class>org.jboss.as.test.integration.ejb.interceptor.lifecycle.order.simple.TestInterceptor</interceptor-class>
       </interceptor>
    </interceptors>
+
    <assembly-descriptor>
        <interceptor-binding>
-           <ejb-name>*</ejb-name>
+           <ejb-name>GreeterBean</ejb-name>
            <interceptor-order>
            	<interceptor-class>org.jboss.as.test.integration.ejb.interceptor.lifecycle.order.simple.TestInterceptor</interceptor-class>
            </interceptor-order>
        </interceptor-binding>
    </assembly-descriptor>
+
 </ejb-jar>
