@@ -88,7 +88,7 @@ public class AuthenticationTestCase extends SecurityTest {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, "ejb3security.war")
                 .addPackage(WhoAmIBean.class.getPackage()).addPackage(EntryBean.class.getPackage())
                 .addPackage(HttpRequest.class.getPackage()).addClass(WhoAmI.class).addClass(Util.class).addClass(Entry.class)
-                .addClass(SLSBWithoutSecurityDomain.class)
+                // .addClass(SLSBWithoutSecurityDomain.class)
                 .addClass(WhoAmIServlet.class).addClass(AuthenticationTestCase.class).addClass(Base64.class)
                 .addClass(SecurityTest.class).addAsResource("ejb3/security/users.properties", "users.properties")
                 .addAsResource("ejb3/security/roles.properties", "roles.properties")
@@ -207,7 +207,7 @@ public class AuthenticationTestCase extends SecurityTest {
         }
     }
     
-    @Test
+    /* @Test
     public void testUnauthenticatedNoSecurityDomain() throws Exception {
         try {
             SLSBWithoutSecurityDomain bean = (SLSBWithoutSecurityDomain) new InitialContext().lookup("java:module/" + SLSBWithoutSecurityDomain.class.getSimpleName());
@@ -221,7 +221,7 @@ public class AuthenticationTestCase extends SecurityTest {
             fail("EJB 3.1 FR 17.6.5 The EJB container must provide the caller’s security context information during the execution of a business method ("
                     + e.getMessage() + ")");
         }
-    }
+    } */
 
 
     @Test
