@@ -32,15 +32,13 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 @Ignore("AS7-2923")
 public class IIOPNamingTestCase {
 
-
     @Deployment
     public static Archive<?> deploy() {
         System.setProperty("com.sun.CORBA.ORBUseDynamicStub", "true");
-        return ShrinkWrap.create(JavaArchive.class, "test.jar")
-                .addPackage(IIOPNamingTestCase.class.getPackage());
+        return ShrinkWrap.create(JavaArchive.class, "test.jar").addPackage(IIOPNamingTestCase.class.getPackage());
     }
 
-    @Deployment(name="test2")
+    @Deployment(name = "test2")
     public static Archive<?> descriptorOverrideDeploy() {
         return ShrinkWrap.create(JavaArchive.class, "test2.jar")
                 .addClasses(IIOPNamingHome.class, IIOPRemote.class, IIOPNamingBean.class)
@@ -70,7 +68,8 @@ public class IIOPNamingTestCase {
         prope.put(Context.PROVIDER_URL, "corbaloc::localhost:3528/JBoss/Naming/root");
         final InitialContext context = new InitialContext(prope);
         final Object iiopObj = context.lookup("test/IIOPStatefulNamingBean");
-        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj, IIOPStatefulNamingHome.class);
+        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj,
+                IIOPStatefulNamingHome.class);
         final IIOPStatefulRemote result = object.create(10);
         Assert.assertEquals(11, result.increment());
         Assert.assertEquals(12, result.increment());
@@ -104,7 +103,8 @@ public class IIOPNamingTestCase {
         prope.put(Context.PROVIDER_URL, "corbaloc::localhost:3528");
         final InitialContext context = new InitialContext(prope);
         final Object iiopObj = context.lookup("test/IIOPStatefulNamingBean");
-        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj, IIOPStatefulNamingHome.class);
+        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj,
+                IIOPStatefulNamingHome.class);
         final IIOPStatefulRemote result = object.create(10);
         Assert.assertEquals(11, result.increment());
         Assert.assertEquals(12, result.increment());
@@ -117,7 +117,7 @@ public class IIOPNamingTestCase {
         }
     }
 
-    @Test 
+    @Test
     public void testIIOPNamingIIOPInvocation() throws NamingException, RemoteException {
         final Properties prope = new Properties();
         prope.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.cosnaming.CNCtxFactory");
@@ -129,14 +129,15 @@ public class IIOPNamingTestCase {
         Assert.assertEquals("hello", result.hello());
     }
 
-    @Test 
+    @Test
     public void testStatefulIIOPNamingIIOPInvocation() throws NamingException, RemoteException, RemoveException {
         final Properties prope = new Properties();
         prope.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.cosnaming.CNCtxFactory");
         prope.put(Context.PROVIDER_URL, "iiop://localhost:3528");
         final InitialContext context = new InitialContext(prope);
         final Object iiopObj = context.lookup("test/IIOPStatefulNamingBean");
-        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj, IIOPStatefulNamingHome.class);
+        final IIOPStatefulNamingHome object = (IIOPStatefulNamingHome) PortableRemoteObject.narrow(iiopObj,
+                IIOPStatefulNamingHome.class);
         final IIOPStatefulRemote result = object.create(10);
         Assert.assertEquals(11, result.increment());
         Assert.assertEquals(12, result.increment());
@@ -150,11 +151,11 @@ public class IIOPNamingTestCase {
 
     /**
      * <p>
-     * Tests the corbaloc lookup of a bean that used the jboss-ejb3.xml deployment descriptor to override the COSNaming
-     * binding. So, insteand of looking for the standard test2/IIOPNamingBean context we will look for the configured
+     * Tests the corbaloc lookup of a bean that used the jboss-ejb3.xml deployment descriptor to override the COSNaming binding.
+     * So, insteand of looking for the standard test2/IIOPNamingBean context we will look for the configured
      * bean/custom/name/IIOPNamingBean context.
      * </p>
-     *
+     * 
      * @throws NamingException if an error occurs while looking up the bean.
      * @throws RemoteException if an error occurs while invoking the remote bean.
      */
@@ -176,7 +177,7 @@ public class IIOPNamingTestCase {
      * binding. So, insteand of looking for the standard test2/IIOPNamingBean context we will look for the configured
      * bean/custom/name/IIOPNamingBean context.
      * </p>
-     *
+     * 
      * @throws NamingException if an error occurs while looking up the bean.
      * @throws RemoteException if an error occurs while invoking the remote bean.
      */
@@ -196,11 +197,11 @@ public class IIOPNamingTestCase {
 
     /**
      * <p>
-     * Tests the iiop lookup of a bean that used the jboss-ejb3.xml deployment descriptor to override the COSNaming
-     * binding. So, insteand of looking for the standard test2/IIOPNamingBean context we will look for the configured
+     * Tests the iiop lookup of a bean that used the jboss-ejb3.xml deployment descriptor to override the COSNaming binding. So,
+     * insteand of looking for the standard test2/IIOPNamingBean context we will look for the configured
      * bean/custom/name/IIOPNamingBean context.
      * </p>
-     *
+     * 
      * @throws NamingException if an error occurs while looking up the bean.
      * @throws RemoteException if an error occurs while invoking the remote bean.
      */
