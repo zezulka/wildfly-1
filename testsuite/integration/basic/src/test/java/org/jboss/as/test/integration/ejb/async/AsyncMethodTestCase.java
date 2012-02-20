@@ -40,18 +40,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests that a simple async annotation works
- *
- * @author Stuart Douglas
+ * Tests that a simple async annotation works.
+ * Enhanced test by migration [JIRA JBQA-5483].
+ * 
+ * @author Stuart Douglas, Ondrej Chaloupka
  */
 @RunWith(Arquillian.class)
 public class AsyncMethodTestCase {
-
     private static final String ARCHIVE_NAME = "StatefulTimeoutTestCase";
 
     @ArquillianResource
     private InitialContext iniCtx;
-
 
     @Deployment
     public static Archive<?> deploy() {
@@ -62,11 +61,13 @@ public class AsyncMethodTestCase {
     }
 
     protected <T> T lookup(Class<T> beanType) throws NamingException {
-        return beanType.cast(iniCtx.lookup("java:global/" + ARCHIVE_NAME + "/" + beanType.getSimpleName() + "!" + beanType.getName()));
+        return beanType.cast(iniCtx.lookup("java:global/" + ARCHIVE_NAME + "/" + beanType.getSimpleName() + "!"
+                + beanType.getName()));
     }
 
+    // Stateless
     @Test
-    public void testVoidAsyncMethod() throws Exception {
+    public void testVoidAsyncStatelessMethod() throws Exception {
         AsyncBean bean = lookup(AsyncBean.class);
         Assert.assertFalse(AsyncBean.voidMethodCalled);
         final CountDownLatch latch = new CountDownLatch(1);
@@ -78,7 +79,7 @@ public class AsyncMethodTestCase {
     }
 
     @Test
-    public void testFutureAsyncMethod() throws Exception {
+    public void testFutureAsyncStatelessMethod() throws Exception {
         AsyncBean bean = lookup(AsyncBean.class);
         final CountDownLatch latch = new CountDownLatch(1);
         final Future<Boolean> future = bean.futureMethod(latch);
@@ -87,7 +88,6 @@ public class AsyncMethodTestCase {
         Assert.assertTrue(AsyncBean.futureMethodCalled);
         Assert.assertTrue(result);
     }
-
 
     @Test
     public void testRequestScopeActive() throws Exception {
@@ -98,5 +98,4 @@ public class AsyncMethodTestCase {
         int result = future.get();
         Assert.assertEquals(20, result);
     }
-
 }
