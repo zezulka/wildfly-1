@@ -207,24 +207,23 @@
                                 <phase>none</phase>
                             </execution>
 
-                            <!-- Single node clustering tests. -->
+                            <!-- Single node clustering tests. 
                             <execution>
                                 <id>ts.surefire.clust.jdbc-store</id> 
                                 <phase>test</phase> 
                                 <goals><goal>test</goal></goals>
                                 <configuration>
-                                    <!-- Tests to execute. -->
                                     <includes>
                                         <include>org/jboss/as/test/clustering/single/jdbcstore/*TestCase.java</include>
                                     </includes>
 
-                                    <!-- Parameters to test cases. -->
                                     <systemPropertyVariables>
                                         <arquillian.launch>clustering-udp-single-jdbc-store</arquillian.launch>
                                         <jboss.server.config.file.name>standalone.xml</jboss.server.config.file.name>
                                     </systemPropertyVariables>
                                 </configuration>
                             </execution>
+-->
 
                         </executions>
                     </plugin>

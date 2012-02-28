@@ -54,4 +54,8 @@ public class ClusteringTestConstants {
     public static final int GRACE_TIME = 20000;
     public static final int GRACE_TIME_TO_REPLICATE = 3000;
 
+    public static final int CLUSTER_ESTABLISHMENT_WAIT_MS = 100;
+    public static final int CLUSTER_ESTABLISHMENT_LOOP_COUNT = 20;
+    public static final int WAIT_FOR_PASSIVATION_MS = 5;
+    public static final int HTTP_REQUEST_WAIT_TIME_S = 5;
 }
