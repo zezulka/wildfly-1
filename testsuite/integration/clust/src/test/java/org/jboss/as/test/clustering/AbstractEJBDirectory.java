@@ -56,6 +56,10 @@ public abstract class AbstractEJBDirectory implements EJBDirectory {
         return this.lookup(beanClass, beanInterface, Type.SINGLETON);
     }
 
+    public void closeContext() throws NamingException {
+        context.close();
+    }
+    
     protected <T> T lookup(Class<? extends T> beanClass, Class<T> beanInterface, Type type) throws NamingException {
         return this.lookup(this.createJndiName(beanClass, beanInterface, type), beanInterface);
     }

@@ -48,6 +48,11 @@ public class ClusteringTestConstants {
     public static final String[] NODES = new String[] { NODE_1, NODE_2 };
 
     /**
+     * Waiting times.
+     */
+    public static final int HTTP_REQUEST_WAIT_TIME_S = 5;
+    
+    /**
      * Timeouts.
      */
     public static final long GRACE_TIME_TO_MEMBERSHIP_CHANGE = 5000;
