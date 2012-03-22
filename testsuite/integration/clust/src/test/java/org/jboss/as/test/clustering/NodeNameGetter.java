@@ -22,17 +22,16 @@
 
 package org.jboss.as.test.clustering;
 
-import org.jboss.logging.Logger;
-
+/**
+ * @author Ondrej Chaloupka
+ */
 public class NodeNameGetter {
-    private static final Logger log = Logger.getLogger(NodeNameGetter.class);
     
     private NodeNameGetter() {
     }
     
     public static String getNodeName() {
         String nodename = System.getProperty("jboss.node.name");
-        log.info("I'm server: " + nodename);
         return nodename;
     }
 }

@@ -276,20 +276,35 @@ public class ClusterPassivationTestCase {
         log.info("Called node name first: " + calledNodeFirst);
         Thread.sleep(WAIT_FOR_PASSIVATION_MS); // waiting for passivation
         statefulBeanRemote.incrementNumber(); // 41
+        
+        // nodeName of nested bean should be the same as the node of parent
+        // Assert.assertEquals(calledNodeFirst, statefulBeanRemote.getNestedBeanNodeName());
 
-        // A small hack - deleting node (by name) from cluster which this client knows.
-        // It means that the next request (ejb call) will be passed to another server
+        // A small hack - deleting node (by name) from cluster which this client knows
+        // It means that the next request (ejb call) will be passed to the server #2
         EJBClientContext.requireCurrent().getClusterContext(CLUSTER_NAME).removeClusterNode(calledNodeFirst);
         // Calling on another (second) server
         Assert.assertEquals(++clientNumber, statefulBeanRemote.getNumber()); // 41
-        // this was redefined in @PrePassivate method on first server - checking whether second server knows about it
+
         if (isPassivation) {
-            // depends on call of method setPassivationNode()
+            // this was redefined in @PrePassivate method on first server - checking whether second server knows about it
             Assert.assertEquals(calledNodeFirst, statefulBeanRemote.getPassivatedBy());
+            // Nested beans have to be passivated as well
+            Assert.assertTrue("Nested bean was not passivated", statefulBeanRemote.getNestedBeanPassivatedCalled() > 0);
+            Assert.assertTrue("Nested bean was not activated", statefulBeanRemote.getNestedBeanActivatedCalled() > 0);
+            Assert.assertTrue("Deep nested bean was not passivated", statefulBeanRemote.getDeepNestedBeanPassivatedCalled() > 0);
+            Assert.assertTrue("Deep nested bean was not activated",statefulBeanRemote.getDeepNestedBeanActivatedCalled() > 0);
+            statefulBeanRemote.resetNestedBean();
         } else {
             Assert.assertNull("We suppose that the passivation is not provided.", statefulBeanRemote.getPassivatedBy());
+            Assert.assertEquals(0, statefulBeanRemote.getNestedBeanPassivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getNestedBeanActivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getDeepNestedBeanPassivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getDeepNestedBeanActivatedCalled());
         }
+        
         String calledNodeSecond = statefulBeanRemote.incrementNumber(); // 42
+        Assert.assertEquals(calledNodeSecond, statefulBeanRemote.getNestedBeanNodeName());
         statefulBeanRemote.setPassivationNode(calledNodeSecond);
         log.info("Called node name second: " + calledNodeSecond);
         Thread.sleep(WAIT_FOR_PASSIVATION_MS); // waiting for passivation
@@ -311,8 +326,17 @@ public class ClusterPassivationTestCase {
         Assert.assertEquals(calledNodeFirst, calledNode);
         if (isPassivation) {
             Assert.assertEquals(calledNodeSecond, statefulBeanRemote.getPassivatedBy());
+            Assert.assertTrue("Nested bean was not passivated", statefulBeanRemote.getNestedBeanPassivatedCalled() > 0);
+            Assert.assertTrue("Nested bean was not activated", statefulBeanRemote.getNestedBeanActivatedCalled() > 0);
+            Assert.assertTrue("Deep nested bean was not passivated", statefulBeanRemote.getDeepNestedBeanPassivatedCalled() > 0);
+            Assert.assertTrue("Deep nested bean was not activated",statefulBeanRemote.getDeepNestedBeanActivatedCalled() > 0);
+            statefulBeanRemote.resetNestedBean();
         } else {
             Assert.assertNull("We suppose that the passivation is not provided.", statefulBeanRemote.getPassivatedBy());
+            Assert.assertEquals(0, statefulBeanRemote.getNestedBeanPassivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getNestedBeanActivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getDeepNestedBeanPassivatedCalled());
+            Assert.assertEquals(0, statefulBeanRemote.getDeepNestedBeanActivatedCalled());
         }
         Thread.sleep(WAIT_FOR_PASSIVATION_MS); // waiting for passivation
         Assert.assertEquals(++clientNumber, statefulBeanRemote.getNumber());

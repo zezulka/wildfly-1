@@ -22,6 +22,7 @@
 
 package org.jboss.as.test.clustering.cluster.ejb3.stateful.passivation;
 
+import javax.ejb.EJB;
 import javax.ejb.PostActivate;
 import javax.ejb.PrePassivate;
 import javax.ejb.Stateful;
@@ -42,6 +43,9 @@ public class StatefulBean implements StatefulBeanRemote {
     private String actIfIsNode;
     private int postActivateCalled = 0;
     private int prePassivateCalled = 0;
+    
+    @EJB
+    private StatefulBeanNested beanNested;
 
     /**
      * Getting number.
@@ -89,5 +93,25 @@ public class StatefulBean implements StatefulBeanRemote {
     public void postActivate() {
         postActivateCalled++;
         log.info("Activating with number: " + number + " and was passivated by " + getPassivatedBy() + ", postActivate method called " + postActivateCalled + " times");
+    }
+    
+    public void resetNestedBean() {
+        beanNested.reset();
+        beanNested.resetDeepNested();
+    }
+    public int getNestedBeanActivatedCalled() {
+        return beanNested.getActivatedCalled();
+    }
+    public int getNestedBeanPassivatedCalled() {
+        return beanNested.getPassivatedCalled();
+    }
+    public int getDeepNestedBeanActivatedCalled() {
+        return beanNested.getDeepNestedActivatedCalled();
+    }
+    public int getDeepNestedBeanPassivatedCalled() {
+        return beanNested.getDeepNestedPassivatedCalled();
+    }
+    public String getNestedBeanNodeName() {
+        return beanNested.getNodeName();
     }
 }
