@@ -24,11 +24,11 @@ package org.jboss.as.test.integration.ejb.stateful.remove.ejb2;
 
 import java.rmi.RemoteException;
 
+import javax.annotation.PreDestroy;
 import javax.ejb.EJBException;
 import javax.ejb.Remote;
 import javax.ejb.RemoteHome;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
+import javax.ejb.Remove;
 import javax.ejb.Stateful;
 import org.jboss.logging.Logger;
 
@@ -38,8 +38,7 @@ import org.jboss.logging.Logger;
 @Stateful
 @Remote(CounterRemote.class)
 @RemoteHome(CounterRemoteHome.class)
-public class CounterBean implements SessionBean {
-    private static final long serialVersionUID = 1L;
+public class CounterBean {
     private static final Logger log = Logger.getLogger(CounterBean.class);
     
     private int count;
@@ -60,24 +59,14 @@ public class CounterBean implements SessionBean {
         return count;
     }
     
-    @Override
+    @PreDestroy
     public void ejbRemove() throws EJBException, RemoteException {
         int count = CounterSingleton.destroyCounter.incrementAndGet();
         log.info("ejbRemove called [" + count + "] ...");
     }
-
-    @Override
-    public void ejbActivate() throws EJBException, RemoteException {
-        
-    }
-
-    @Override
-    public void ejbPassivate() throws EJBException, RemoteException {
-        
-    }
-
-    @Override
-    public void setSessionContext(SessionContext arg0) throws EJBException, RemoteException {
-        
+    
+    @Remove
+    public void remove() {
+        log.info("Removing...");
     }
 }
