@@ -23,6 +23,11 @@
 				<remote>org.jboss.as.test.integration.ejb.ejb2.reference.eararchive.Test3</remote>
 			</ejb-ref> 
     	</session>
+    	
+    	<session>
+    		<ejb-name>SomeStatefulBean</ejb-name>
+    		<ejb-class>42</ejb-class>
+    	</session>
 	</enterprise-beans>
 </ejb-jar>
 
