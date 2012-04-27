@@ -163,10 +163,16 @@
                                 <goals><goal>test</goal></goals>
                                 <configuration>
                                     <!-- Tests to execute. Overriden in webProfileExclusion.profile . -->
+				    <!--<runOrder>reversealphabetical</runOrder>-->
+				    <runOrder>alphabetical</runOrder> <!--reversealphabetical-->
                                     <includes>
-                                        <include>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</include>
-                                        <include>org/jboss/as/test/integration/*/security/**/*TestCase.java</include>
-                                        <include>org/jboss/as/test/integration/ejb/mdb/**/*TestCase*.java</include>
+                                        <!--<include>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</include>
+                                        <include>org/jboss/as/test/integration/*/security/**/*TestCase.java</include>-->
+                                        <!--<include>org/jboss/as/test/integration/*/security/SingleMethodsAnnSFSBTestCase.java</include>-->
+                                        <include>org/jboss/as/test/integration/*/security/runas/RunAsTestCase.java</include>
+                                        <include>org/jboss/as/test/integration/*/security/SingleMethodsAnnSFSBTestCase.java</include>
+                                        <include>org/jboss/as/test/integration/*/security/asynchronous/AsynchronousSecurityTestCase.java</include>
+                                        <!--<include>org/jboss/as/test/integration/ejb/mdb/**/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/ejb/pool/**/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/ejb/entity/cmp/**/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/ejb/remote/entity/cmp/**/*TestCase*.java</include>
@@ -181,6 +187,7 @@
                                         <include>org/jboss/as/test/integration/ee/injection/resource/resourceref/*TestCase.java</include>
                                         <include>org/jboss/as/test/integration/ee/injection/resource/enventry/EnvEntryTestCase.java</include>
                                         <include>org/jboss/as/test/integration/ee/injection/resource/basic/*TestCase.java</include>
+					-->
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
