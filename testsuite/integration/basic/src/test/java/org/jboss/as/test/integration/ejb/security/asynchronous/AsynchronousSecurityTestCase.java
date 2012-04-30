@@ -93,7 +93,6 @@ public class AsynchronousSecurityTestCase {
         SecuredStatelessRemote securedBean = lookupInterface(SecuredStatelessBean.class, SecuredStatelessRemote.class);
 
         boolean result = false;
-        Future<Boolean> future;
         
         // Test 1
         SecuredStatelessBean.reset();
@@ -102,9 +101,9 @@ public class AsynchronousSecurityTestCase {
         lc.login();
         
         try {
-            future = securedBean.method();
-            SecuredStatelessBean.startLatch.countDown();
-            result = future.get();
+            result = securedBean.method();
+            /* SecuredStatelessBean.startLatch.countDown();
+            result = future.get(); */
         } finally {
             lc.logout();
         }
@@ -112,15 +111,14 @@ public class AsynchronousSecurityTestCase {
         
         // Test 2
         SecuredStatelessBean.reset();
-        future = null;
         result = false;
         lc = Util.getCLMLoginContext("rolefail", "password");
         lc.login();
         
         try {
-            future = securedBean.method();
-            SecuredStatelessBean.startLatch.countDown();
-            result = future.get();
+            result = securedBean.method();
+            /* SecuredStatelessBean.startLatch.countDown();
+            result = future.get(); */
         } catch (ExecutionException ee) {
             if(!(ee.getCause() instanceof EJBAccessException)) {
                 Assert.fail("Exception cause was not EJBAccessException and was " + ee);
@@ -134,15 +132,14 @@ public class AsynchronousSecurityTestCase {
 
         // Test 3
         SecuredStatelessBean.reset();
-        future = null;
         result = false;
         lc = Util.getCLMLoginContext("nosuchuser", "password");
         lc.login();
         
         try {
-            future = securedBean.method();
-            SecuredStatelessBean.startLatch.countDown();
-            result = future.get();
+            result = securedBean.method();
+            /* SecuredStatelessBean.startLatch.countDown();
+            result = future.get(); */
         } catch (ExecutionException ee) {
             if(!(ee.getCause() instanceof EJBAccessException)) {
                 Assert.fail("Exception cause was not EJBAccessException and was " + ee);
@@ -166,25 +163,21 @@ public class AsynchronousSecurityTestCase {
         
         // Test 1
         try {
-            Future<Boolean> future = securedBean.uncheckedMethod();
-            SecuredStatelessBean.startLatch.countDown();
-            boolean result = future.get();
+            Boolean result = securedBean.uncheckedMethod();
+            /*SecuredStatelessBean.startLatch.countDown();
+            boolean result = future.get(); */
             Assert.assertTrue(result);
     
             // Test 2
-            future = null;
+            // future = null;
             result = false;
             SecuredStatelessBean.reset();
             try {
-                future = securedBean.excludedMethod();
-                SecuredStatelessBean.startLatch.countDown();
-                result = future.get();
-            } catch (ExecutionException ee) {
-                if(!(ee.getCause() instanceof EJBAccessException)) {
-                    Assert.fail("Exception cause was not EJBAccessException and was " + ee);
-                }
-            } catch (EJBAccessException ejbe) {
-                // it's ok too
+                result = securedBean.excludedMethod();
+                /*SecuredStatelessBean.startLatch.countDown();  
+                result = future.get(); */
+            } catch (Exception ee) {
+                // this is ok
             }
             Assert.assertFalse(result);
         } finally {

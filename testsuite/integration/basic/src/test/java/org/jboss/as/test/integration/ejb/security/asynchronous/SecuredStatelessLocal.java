@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
  * @author <a href="mailto:kabir.khan@jboss.org">Kabir Khan</a>
  */
 public interface SecuredStatelessLocal {
-    Future<Boolean> localSecured(CountDownLatch latchLocal) throws InterruptedException;
+    Boolean localSecured(CountDownLatch latchLocal) throws InterruptedException;
 
-    Future<Boolean> excludedMethod() throws InterruptedException;
+    Boolean excludedMethod() throws InterruptedException;
 }

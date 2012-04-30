@@ -30,10 +30,10 @@ import java.util.concurrent.Future;
  */
 public interface SecuredStatelessRemote {
 
-    Future<Boolean> uncheckedMethod() throws InterruptedException;
+    Boolean uncheckedMethod() throws InterruptedException;
 
-    Future<Boolean> excludedMethod() throws InterruptedException;
+    Boolean excludedMethod() throws InterruptedException;
 
-    Future<Boolean> method() throws InterruptedException, ExecutionException;
+    Boolean method() throws InterruptedException, ExecutionException;
 
 }

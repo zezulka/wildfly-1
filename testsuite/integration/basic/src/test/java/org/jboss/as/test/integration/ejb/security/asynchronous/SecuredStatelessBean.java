@@ -49,7 +49,7 @@ import org.junit.Assert;
 @SecurityDomain("async-security-test")
 @Remote(SecuredStatelessRemote.class)
 @Local(SecuredStatelessLocal.class)
-@Asynchronous
+// @Asynchronous
 public class SecuredStatelessBean implements SecuredStatelessRemote, SecuredStatelessLocal {
     
     public static volatile CountDownLatch startLatch = new CountDownLatch(1);
@@ -59,38 +59,38 @@ public class SecuredStatelessBean implements SecuredStatelessRemote, SecuredStat
     }
 
     @PermitAll
-    public Future<Boolean> uncheckedMethod() throws InterruptedException {
-        try {
+    public Boolean uncheckedMethod() throws InterruptedException {
+        /* try {
             if(!startLatch.await(5, TimeUnit.SECONDS)) {
                 throw new RuntimeException("Invocation was not asynchronous");
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        return new AsyncResult<Boolean>(true);
+        } */
+        return new Boolean(true);
     }
 
     @DenyAll
-    public Future<Boolean> excludedMethod() throws InterruptedException {
-        try {
+    public Boolean excludedMethod() throws InterruptedException {
+        /*try {
             if(!startLatch.await(5, TimeUnit.SECONDS)) {
                 throw new RuntimeException("Invocation was not asynchronous");
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        return new AsyncResult<Boolean>(true);
+        }*/
+        return new Boolean(true);
     }
 
     @RolesAllowed("allowed")
-    public Future<Boolean> method() throws InterruptedException, ExecutionException  {
-        try {
+    public Boolean method() throws InterruptedException, ExecutionException  {
+        /*try {
             if(!startLatch.await(5, TimeUnit.SECONDS)) {
                 throw new RuntimeException("Invocation was not asynchronous");
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         
         SecuredStatelessLocal localSearchedBean = null;
         try {
@@ -101,19 +101,19 @@ public class SecuredStatelessBean implements SecuredStatelessRemote, SecuredStat
             throw new RuntimeException(e);
         }
         
-        final CountDownLatch latchLocal = new CountDownLatch(1);
-        final Future<Boolean> future = localSearchedBean.localSecured(latchLocal);
+        /*final CountDownLatch latchLocal = new CountDownLatch(1);
+        final Boolean future = localSearchedBean.localSecured(latchLocal);
         latchLocal.countDown();
         boolean result = future.get();
-        Assert.assertTrue(result);
+        Assert.assertTrue(result); */
 
-        return new AsyncResult<Boolean>(true);
+        return new Boolean(true);
     }
     
     @RolesAllowed("allowed")
-    public Future<Boolean> localSecured(CountDownLatch latchLocal) throws InterruptedException {
-        latchLocal.await(5, TimeUnit.SECONDS);
-        return new AsyncResult<Boolean>(true);
+    public Boolean localSecured(CountDownLatch latchLocal) throws InterruptedException {
+        // latchLocal.await(5, TimeUnit.SECONDS);
+        return new Boolean(true);
     }
 
 }
