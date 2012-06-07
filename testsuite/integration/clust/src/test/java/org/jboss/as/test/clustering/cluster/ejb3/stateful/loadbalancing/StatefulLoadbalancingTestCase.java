@@ -27,6 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.management.RuntimeErrorException;
+
 import org.jboss.arquillian.container.test.api.*;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
@@ -67,10 +76,13 @@ public class StatefulLoadbalancingTestCase {
     public static final String ARCHIVE_NAME = "stateful-loadbalancing-test";
     private static EJBDirectory context;
     private static ContextSelector<EJBClientContext> previousSelector;
+    private static List<StatefulBeanRemote> beanList = new ArrayList<StatefulBeanRemote>();
     // number of percent to tolerate that the load balancing works right
     private static final double PERCENTAGE_TOLERANCE = 8.0;
     // number of newly created stateful beans in test
     private static final int NUMBER_OF_BEANS = 200;
+    private static final int NUMBER_OF_THREADS = 20;
+    private static AtomicInteger threadNumber = new AtomicInteger(0);
 
     @BeforeClass
     public static void printSysProps() throws Exception {
@@ -152,6 +164,30 @@ public class StatefulLoadbalancingTestCase {
         }
         log.info("validateBalancing(): " + sb);
     }
+    
+    private final class CallBeanTask implements Callable<Map<String, Integer>> {
+        public Map<String, Integer> call(){
+            int currentThreadNumber = threadNumber.incrementAndGet();
+            log.info("Starting thread: " + currentThreadNumber);
+            Map<String, Integer> nodeNameMap = new HashMap<String, Integer>();
+            try {
+                for(int i=0; i<NUMBER_OF_BEANS; i++) {
+                    StatefulBeanRemote bean = context.lookupStateful(StatefulBean.class, StatefulBeanRemote.class);
+                    String nodeName = bean.getNodeName();
+                    int number = nodeNameMap.get(nodeName) == null ?  1 : nodeNameMap.get(nodeName) + 1; 
+                    nodeNameMap.put(bean.getNodeName(), number);
+                    synchronized (beanList) {
+                        beanList.add(bean);                        
+                    }
+                }
+            } catch(Exception e) {
+                // in case of error we just throw runtime exception to be shown
+                throw new RuntimeException(e);
+            }
+
+            return nodeNameMap;
+        }
+    }
 
     @Test
     @InSequence(1)
@@ -160,30 +196,25 @@ public class StatefulLoadbalancingTestCase {
         previousSelector = EJBClientContextSelector
                 .setup("cluster/ejb3/stateful/loadbalance/jboss-ejb-client.properties");
         
-        List<StatefulBeanRemote> beanList = new ArrayList<StatefulBeanRemote>();
-        Map<String, Integer> nodeNameMap = new HashMap<String, Integer>();
+        beanList = new ArrayList<StatefulBeanRemote>();
+        ExecutorService threadPool = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+        CompletionService<Map<String, Integer>> pool = new ExecutorCompletionService<Map<String, Integer>>(threadPool);
+        pool.submit(new CallBeanTask());
         
-        try {
-            for(int i=0; i<NUMBER_OF_BEANS; i++) {
-                StatefulBeanRemote bean = context.lookupStateful(StatefulBean.class, StatefulBeanRemote.class);
-                String nodeName = bean.getNodeName();
-                int number = nodeNameMap.get(nodeName) == null ?  1 : nodeNameMap.get(nodeName) + 1; 
-                nodeNameMap.put(bean.getNodeName(), number);
-                beanList.add(bean);
-            }
+        Map<String, Integer> result = pool.take().get();
         
-            Assert.assertEquals(NODES.length + " servers were started but the test worked with " + nodeNameMap.size(), NODES.length, nodeNameMap.size());
-            validateBalancing(nodeNameMap);
-            
-            // Call beans once again
-            for(StatefulBeanRemote bean: beanList) {
-                log.info("Second call from: " + bean.getNodeName());
-            }
-        } finally {
-            // Remove all created beans
-            for(StatefulBeanRemote bean: beanList) {
-                bean.remove();
-            }
+        Assert.assertEquals(NODES.length + " servers were started but the test worked with " + result.size(), NODES.length, result.size());
+        validateBalancing(result);
+
+        threadPool.shutdown();
+        
+        // Call beans once again
+        for(StatefulBeanRemote bean: beanList) {
+            log.info("Second call from: " + bean.getNodeName());
+        }
+        // Remove beans
+        for(StatefulBeanRemote bean: beanList) {
+            bean.remove();
         }
       }
     
