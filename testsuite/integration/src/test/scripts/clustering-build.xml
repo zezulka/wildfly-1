@@ -8,6 +8,8 @@
 
                 <echo>clustering-udp-0 node0: ${node0}</echo>
                 <echo>clustering-udp-0 node1: ${node1}</echo>
+                <echo>clustering-udp-0 node2: ${node2}</echo>
+                <echo>clustering-udp-0 node3: ${node3}</echo>
                 <echo>clustering-udp-0 mcast: ${mcast}</echo>
 
         <echo message="  =========  Building config clustering-udp-0  =========  "/>
@@ -32,6 +34,28 @@
             mcast.jgroupsDiag="${mcast.jgroupsDiag}"
             mcast.modcluster="${mcast.modcluster}"/>
         <ts.config-as.add-port-offset name="jbossas-clustering-udp-1" offset="100" nativePort="9999" httpPort="9990"/>
+
+        <echo message="  =========  Building config clustering-udp-2  =========  "/>
+        <copy todir="target/jbossas-clustering-udp-2" overwrite="true">
+            <fileset dir="${basedir}/target/jbossas"/>
+        </copy>
+        <ts.config-as.ip-with-multicast name="jbossas-clustering-udp-2"
+            node="${node2}"
+            mcast="${mcast}"
+            mcast.jgroupsDiag="${mcast.jgroupsDiag}"
+            mcast.modcluster="${mcast.modcluster}"/>
+        <ts.config-as.add-port-offset name="jbossas-clustering-udp-2" offset="200" nativePort="9999" httpPort="9990"/>
+
+        <echo message="  =========  Building config clustering-udp-3  =========  "/>
+        <copy todir="target/jbossas-clustering-udp-3" overwrite="true">
+            <fileset dir="${basedir}/target/jbossas"/>
+        </copy>
+        <ts.config-as.ip-with-multicast name="jbossas-clustering-udp-3"
+            node="${node3}"
+            mcast="${mcast}"
+            mcast.jgroupsDiag="${mcast.jgroupsDiag}"
+            mcast.modcluster="${mcast.modcluster}"/>
+        <ts.config-as.add-port-offset name="jbossas-clustering-udp-3" offset="300"  nativePort="9999" httpPort="9990"/>
 
     </target>
 

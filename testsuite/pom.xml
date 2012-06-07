@@ -97,6 +97,8 @@
         <!-- IP address defaults. -->
         <node0>127.0.0.1</node0>
         <node1>127.0.0.1</node1>
+        <node2>127.0.0.1</node2>
+        <node3>127.0.0.1</node3>
         <mcast>230.0.0.4</mcast> <!-- Default multicast address. -->
         <mcast.jgroupsDiag>224.0.75.75</mcast.jgroupsDiag>  <!-- for <socket-binding name="jgroups-diagnostics" .../> -->
         <mcast.modcluster >224.0.1.105</mcast.modcluster>   <!-- for <socket-binding name="modcluster" .../> -->

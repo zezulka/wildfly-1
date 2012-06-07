@@ -55,11 +55,15 @@
                                     <target>
                                         <echo>In Maven: node0: ${node0}</echo>
                                         <echo>In Maven: node1: ${node1}</echo>
+                                        <echo>In Maven: node2: ${node2}</echo>
+                                        <echo>In Maven: node3: ${node3}</echo>
                                         <echo>In Maven: mcast: ${mcast}</echo>
                                         <!-- Build the UDP server configs in target/ . -->
                                         <ant antfile="${basedir}/../src/test/scripts/clustering-build.xml">
                                             <property name="node0" value="${node0}"/> <!-- inheritAll="true" doesn't work. -->
                                             <property name="node1" value="${node1}"/>
+                                            <property name="node2" value="${node2}"/>
+                                            <property name="node3" value="${node3}"/>
                                             <property name="mcast" value="${mcast}"/>
                                             <target name="build-clustering-udp"/>
                                         </ant>
@@ -91,7 +95,7 @@
                                 <configuration>
                                     <!-- Tests to execute. -->
                                     <includes>
-                                        <include>org/jboss/as/test/clustering/cluster/**/*TestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/cluster/**/StatefulLoadbalancingTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
@@ -113,8 +117,8 @@
                                 <configuration>
                                     <!-- Tests to execute. -->
                                     <includes>
-                                        <include>org/jboss/as/test/clustering/single/web/*TestCase.java</include>
-                                        <include>org/jboss/as/test/clustering/single/ejb/**/*TestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/single/web/abcTestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/single/ejb/**/abcTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
@@ -189,7 +193,7 @@
                                 <configuration>
                                     <!-- Tests to execute, same tests as for UDP tests. -->
                                     <includes>
-                                        <include>org/jboss/as/test/clustering/cluster/**/*TestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/cluster/**/abcTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
@@ -304,7 +308,7 @@
                                 <configuration>
                                     <!-- Tests to execute. -->
                                     <includes>
-                                        <include>org/jboss/as/test/clustering/single/jdbcstore/*TestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/single/jdbcstore/abcTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->

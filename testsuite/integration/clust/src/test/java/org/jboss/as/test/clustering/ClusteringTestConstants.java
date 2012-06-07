@@ -36,21 +36,27 @@ public class ClusteringTestConstants {
      */
     public static final String CONTAINER_1 = "container-0";
     public static final String CONTAINER_2 = "container-1";
-    public static final String[] CONTAINERS = new String[] { CONTAINER_1, CONTAINER_2 };
+    public static final String CONTAINER_3 = "container-2";
+    public static final String CONTAINER_4 = "container-3";
+    public static final String[] CONTAINERS = new String[] { CONTAINER_1, CONTAINER_2, CONTAINER_3, CONTAINER_4 };
 
     /**
      * Deployment names.
      */
     public static final String DEPLOYMENT_1 = "deployment-0";
     public static final String DEPLOYMENT_2 = "deployment-1";
-    public static final String[] DEPLOYMENTS = new String[] { DEPLOYMENT_1, DEPLOYMENT_2 };
+    public static final String DEPLOYMENT_3 = "deployment-2";
+    public static final String DEPLOYMENT_4 = "deployment-3";
+    public static final String[] DEPLOYMENTS = new String[] { DEPLOYMENT_1, DEPLOYMENT_2, DEPLOYMENT_3, DEPLOYMENT_4 };
 
     /**
      * Node names passed in arquillian.xml via -Djboss.node.name property.
      */
     public static final String NODE_1 = "node-0";
     public static final String NODE_2 = "node-1";
-    public static final String[] NODES = new String[] { NODE_1, NODE_2 };
+    public static final String NODE_3 = "node-2";
+    public static final String NODE_4 = "node-3";
+    public static final String[] NODES = new String[] { NODE_1, NODE_2, NODE_3, NODE_4};
 
     /**
      * Name of cluster for remote client.

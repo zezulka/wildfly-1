@@ -64,6 +64,34 @@
                 <property name="waitForPortsTimeoutInSeconds">8</property>
             </configuration>
         </container>
+
+        <container qualifier="container-2" mode="manual" managed="false">
+            <configuration>
+                <property name="jbossHome">${basedir}/target/jbossas-clustering-${stack}-2</property>
+                <property name="javaVmArguments">${server.jvm.args} -Djboss.inst=${basedir}/target/jbossas-clustering-${stack}-2 -Djboss.node.name=node-2 -Djboss.port.offset=200</property>
+                <property name="serverConfig">${jboss.server.config.file.name:standalone-ha.xml}</property>
+                <property name="managementAddress">${node1}</property>
+                <property name="managementPort">10199</property>
+
+                <!-- AS7-4070 -->
+                <property name="waitForPorts">${as.debug.port.node2} 10199</property>
+                <property name="waitForPortsTimeoutInSeconds">12</property>
+            </configuration>
+        </container>
+
+        <container qualifier="container-3" mode="manual" managed="false">
+            <configuration>
+                <property name="jbossHome">${basedir}/target/jbossas-clustering-${stack}-3</property>
+                <property name="javaVmArguments">${server.jvm.args} -Djboss.inst=${basedir}/target/jbossas-clustering-${stack}-3 -Djboss.node.name=node-3 -Djboss.port.offset=300</property>
+                <property name="serverConfig">${jboss.server.config.file.name:standalone-ha.xml}</property>
+                <property name="managementAddress">${node1}</property>
+                <property name="managementPort">10299</property>
+
+                <!-- AS7-4070 -->
+                <property name="waitForPorts">${as.debug.port.node3} 10299</property>
+                <property name="waitForPortsTimeoutInSeconds">12</property>
+            </configuration>
+        </container>
         
     </group>
 
