@@ -30,5 +30,6 @@ import javax.ejb.Remote;
 @Remote
 public interface StatefulBeanRemote {
     void remove();
+
     String getNodeName();
 }

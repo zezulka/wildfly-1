@@ -44,7 +44,9 @@ public class StatefulBean implements StatefulBeanRemote {
 
     @Override
     public String getNodeName() {
-        return NodeNameGetter.getNodeName();
+        String nodeName = NodeNameGetter.getNodeName();
+        log.info("Returning nodeName: " + nodeName);
+        return nodeName;
     }
 
 }

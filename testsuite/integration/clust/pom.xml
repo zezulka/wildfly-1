@@ -95,7 +95,7 @@
                                 <configuration>
                                     <!-- Tests to execute. -->
                                     <includes>
-                                        <include>org/jboss/as/test/clustering/cluster/**/StatefulLoadbalancingTestCase.java</include>
+                                        <include>org/jboss/as/test/clustering/cluster/**/StatefulLoadbalancingConcurrentTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
