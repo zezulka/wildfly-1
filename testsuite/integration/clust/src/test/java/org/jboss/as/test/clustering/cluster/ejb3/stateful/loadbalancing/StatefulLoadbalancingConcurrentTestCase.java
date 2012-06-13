@@ -76,10 +76,10 @@ public class StatefulLoadbalancingConcurrentTestCase {
     private static ContextSelector<EJBClientContext> previousSelector;
     private static List<StatefulBeanRemote> beanList = new ArrayList<StatefulBeanRemote>();
     // number of percent to tolerate that the load balancing works right
-    private static final double PERCENTAGE_TOLERANCE = 12.0;
+    private static final double PERCENTAGE_TOLERANCE = 10.0;
     // number of newly created stateful beans in test
-    private static final int NUMBER_OF_BEANS = 200;
-    private static final int NUMBER_OF_THREADS = 8;
+    private static final int NUMBER_OF_BEANS = 400;
+    private static final int NUMBER_OF_THREADS = 12;
     private static AtomicInteger threadNumber = new AtomicInteger(0);
 
     @BeforeClass
@@ -161,7 +161,7 @@ public class StatefulLoadbalancingConcurrentTestCase {
                     && (currentPercentage <= supposedPercentage + PERCENTAGE_TOLERANCE));
             sb.append(String.format("[%s: %1.2f %%] ", nodeName, currentPercentage));
         }
-        log.info("validateBalancing(): " + sb);
+        log.info("validateBalancing[validation loadbalancing, vvalidate](): " + sb);
     }
 
     private final class CallBeanTask implements Callable<Map<String, Integer>> {

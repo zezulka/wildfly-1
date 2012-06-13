@@ -22,7 +22,10 @@
 
 package org.jboss.as.test.clustering.cluster.ejb3.stateful.loadbalancing;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Remove;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
 import org.jboss.as.test.clustering.NodeNameGetter;
 import org.jboss.ejb3.annotation.Clustered;
@@ -35,7 +38,15 @@ import org.jboss.logging.Logger;
 @Clustered
 public class StatefulBean implements StatefulBeanRemote {
     private static final Logger log = Logger.getLogger(StatefulBean.class);
+    
+    @Resource
+    private SessionContext ctx;
 
+    @PostConstruct
+    public void postConstruct() {
+        // log.info("Bean " + this + " was created as ejb object: " + ctx.getInvokedBusinessInterface());
+    }
+    
     @Override
     @Remove
     public void remove() {
