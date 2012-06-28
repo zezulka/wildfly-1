@@ -48,7 +48,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
     public static final String SECURITY_REALM_NAME = "SSLRealm";
     public static final String KEYSTORE_RELATIVE_PATH = "ejb" + File.separator + "keystore";
     public static final String KEYSTORE_SERVER_FILENAME = "server.keystore";
-    public static final String KEYSTORE_CLIENT_FILENAME = "client.keystore";
+    public static final String TRUSTSTORE_CLIENT_FILENAME = "client.truststore";
     public static final String KEYSTORE_PASSWORD = "123456";
     public static final String AUTHENTICATION_PROPERTIES_PATH = "application-users.properties";
     public static final String AUTHENTICATION_PROPERTIES_RELATIVE_TO = "jboss.server.config.dir";
@@ -154,7 +154,6 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         URL resourcesUrl = tccl.getResource("");
         String resourcePath = resourcesUrl.getPath();
         log.info("Path to resources is " + resourcePath);
-        // String testAbsPath = new File(SSLEJBRemoteClientTestCase.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getAbsolutePath();
         operation = new ModelNode();
         operation.get(OP_ADDR).set(getSecurityRealmsAddressSSLIdentity());
         operation.get(OP).set(ADD);

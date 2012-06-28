@@ -76,12 +76,14 @@ public class SSLEJBRemoteClientTestCase {
 
         try {
             // Defining for client where to find certificate
-            System.setProperty("javax.net.ssl.trustStore", SSLRealmSetupTask.KEYSTORE_ABSOLUTE_PATH + SSLRealmSetupTask.KEYSTORE_CLIENT_FILENAME);
+            log.info("ABS cert path: " + SSLRealmSetupTask.KEYSTORE_ABSOLUTE_PATH + SSLRealmSetupTask.TRUSTSTORE_CLIENT_FILENAME);
+            System.setProperty("javax.net.ssl.trustStore", SSLRealmSetupTask.KEYSTORE_ABSOLUTE_PATH + SSLRealmSetupTask.TRUSTSTORE_CLIENT_FILENAME);
             System.setProperty("javax.net.ssl.trustStorePassword", SSLRealmSetupTask.KEYSTORE_PASSWORD);
+            System.setProperty("javax.net.debug", "all"); 
             // System.setProperty("javax.net.ssl.keyStore", SSLRealmSetupTask.KEYSTORE_CLIENT_FILENAME);
          
             // Taken properties defined to use SSL
-            previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
+            // previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
             
             Properties env = new Properties();
             env.setProperty(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
