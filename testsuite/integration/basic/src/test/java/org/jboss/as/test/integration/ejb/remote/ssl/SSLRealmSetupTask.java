@@ -89,8 +89,8 @@ public class SSLRealmSetupTask implements ServerSetupTask {
     public static void reload(final ManagementClient managementClient) throws Exception {
         ModelNode operation = new ModelNode();
         operation.get(OP).set("reload");
-        log.info("Executing operation :reload on DMR");
-        managementClient.getControllerClient().execute(operation);
+        ModelNode result = managementClient.getControllerClient().execute(operation);
+        log.info("Operation :reload executed with result " + result);
         boolean reloaded = false;
         int i = 0;
         while (!reloaded) {
@@ -120,7 +120,6 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         ModelNode result = managementClient.getControllerClient().execute(operation);
         log.infof("Setting security realm %s to remoting connector with result %s", SSLRealmSetupTask.SECURITY_REALM_NAME, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        SSLRealmSetupTask.reload(managementClient);
     }
    
     
@@ -161,8 +160,8 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         operation.get(OP).set(ADD);
         operation.get("keystore-password").set(KEYSTORE_PASSWORD);
         KEYSTORE_ABSOLUTE_PATH =  resourcePath + KEYSTORE_RELATIVE_PATH;
-        operation.get("keystore-relative-to").set(KEYSTORE_ABSOLUTE_PATH);
-        operation.get("keystore-path").set(KEYSTORE_SERVER_FILENAME);
+        // operation.get("keystore-relative-to").set(KEYSTORE_ABSOLUTE_PATH);
+        operation.get("keystore-path").set(KEYSTORE_ABSOLUTE_PATH + File.separator + KEYSTORE_SERVER_FILENAME);
         result = managementClient.getControllerClient().execute(operation);
         log.infof("Setting server-identity ssl for realm %s (password %s, keystore path %s%s%s) with result %s", SECURITY_REALM_NAME,
                 KEYSTORE_PASSWORD, KEYSTORE_ABSOLUTE_PATH, result);
@@ -189,9 +188,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         result = managementClient.getControllerClient().execute(operation);
         log.infof("Setting authentication of %s (path %s, relative to %s) with result %s", SECURITY_REALM_NAME,
                 AUTHENTICATION_PROPERTIES_PATH, AUTHENTICATION_PROPERTIES_RELATIVE_TO, result);
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        
-        reload(managementClient);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());        
     }
 
     @Override

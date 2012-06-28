@@ -52,7 +52,7 @@ import org.junit.runner.RunWith;
  * @author Ondrej Chaloupka
  */
 @RunWith(Arquillian.class)
-@ServerSetup(SSLRealmSetupTask.class)
+// @ServerSetup(SSLRealmSetupTask.class)
 @RunAsClient
 public class SSLEJBRemoteClientTestCase {
     private static final Logger log = Logger.getLogger(SSLEJBRemoteClientTestCase.class);
@@ -70,8 +70,8 @@ public class SSLEJBRemoteClientTestCase {
     @Test
     public void test(@ArquillianResource ManagementClient managementClient) throws Exception {       
         // Defining remoting connector to use ssl security realm
-        SSLRealmSetupTask.setRemotingConnectorRealm(managementClient, SSLRealmSetupTask.SECURITY_REALM_NAME);
-        SSLRealmSetupTask.reload(managementClient);
+        //SSLRealmSetupTask.setRemotingConnectorRealm(managementClient, SSLRealmSetupTask.SECURITY_REALM_NAME);
+       // SSLRealmSetupTask.reload(managementClient);
         ContextSelector<EJBClientContext> previousSelector = null;
 
         try {
@@ -81,7 +81,7 @@ public class SSLEJBRemoteClientTestCase {
             // System.setProperty("javax.net.ssl.keyStore", SSLRealmSetupTask.KEYSTORE_CLIENT_FILENAME);
          
             // Taken properties defined to use SSL
-            // previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
+            previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
             
             Properties env = new Properties();
             env.setProperty(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
@@ -95,17 +95,7 @@ public class SSLEJBRemoteClientTestCase {
             if(previousSelector != null) {
                 EJBClientContext.setSelector(previousSelector);
             }
-            // SSLRealmSetupTask.setRemotingConnectorRealm(managementClient, SSLRealmSetupTask.PREVIOUS_SECURITY_REALM_NAME);
+            //SSLRealmSetupTask.setRemotingConnectorRealm(managementClient, SSLRealmSetupTask.PREVIOUS_SECURITY_REALM_NAME);
         }
-    }
-    
-    public static void main(String[] args) throws Exception {
-        Properties env = new Properties();
-        env.setProperty(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");       
-        InitialContext ctx = new InitialContext(env);
-        StatelessBeanRemote bean = (StatelessBeanRemote) ctx.lookup(String.format("ejb:/%s//%s!%s",
-                MODULE_NAME, StatelessBean.class.getSimpleName(), StatelessBeanRemote.class.getName()));
-        System.out.println("Preparing to say hello...");
-        System.out.println(bean.sayHello());
     }
 }
