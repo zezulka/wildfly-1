@@ -41,7 +41,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -226,6 +225,16 @@ public class AsyncMethodTestCase {
         String result = future.get();
         Assert.assertFalse(wasCanceled); // this should be false because task was not cancelled
         Assert.assertEquals("false;true", result); // the bean knows that it was cancelled
+    }
+    
+    @Test
+    @RunAsClient
+    public void testRemoteAsyncParent() throws Exception {
+        AsyncBeanRemoteInterface bean = (AsyncBeanRemoteInterface) remoteContext.lookup(ARCHIVE_NAME + "/" + 
+                AsyncBeanInherited.class.getSimpleName() + "!" + AsyncBeanRemoteInterface.class.getName());
+        bean.asyncMethod();
+        Future<Boolean> ret = bean.futureMethod();
+        Assert.assertEquals(true, ret.get());
     }
 
     /**
