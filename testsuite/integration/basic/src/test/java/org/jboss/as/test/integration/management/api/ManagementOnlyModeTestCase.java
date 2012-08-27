@@ -76,7 +76,7 @@ public class ManagementOnlyModeTestCase extends ContainerResourceMgmtTestBase {
         ModelNode result = executeOperation(op);
 
         // wait until the server is admin-only mode
-        RetryTaskExecutor rte = new RetryTaskExecutor();
+        RetryTaskExecutor<ModelNode> rte = new RetryTaskExecutor<ModelNode>();
         rte.retryTask(new Callable<ModelNode>() {
 
             public ModelNode call() throws Exception {
@@ -110,7 +110,7 @@ public class ManagementOnlyModeTestCase extends ContainerResourceMgmtTestBase {
         result = executeOperation(op);
 
         // wait until the server is in normal mode
-        rte = new RetryTaskExecutor();
+        rte = new RetryTaskExecutor<ModelNode>();
         rte.retryTask(new Callable<ModelNode>() {
             public ModelNode call() throws Exception {
                 ModelNode rop = createOpNode(null, READ_ATTRIBUTE_OPERATION);
