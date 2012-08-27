@@ -24,9 +24,7 @@ package org.jboss.as.test.integration.management.reload;
 
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
-import static org.jboss.as.test.integration.management.util.ModelUtil.createOpNode;
 
-import org.apache.log4j.Logger;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -34,6 +32,7 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ContainerResource;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.dmr.ModelNode;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -46,7 +45,6 @@ import org.junit.runner.RunWith;
  * 
  * https://issues.jboss.org/browse/AS7-4185
  * https://issues.jboss.org/browse/ARQ-791
- * https://issues.jboss.org/browse/AS7-4185
  * https://issues.jboss.org/browse/AS7-5133
  * 
  * @author Ondrej Chaloupka
@@ -69,42 +67,26 @@ public class ReloadTestCase {
     @Test
     public void test(@ArquillianResource ManagementClient client) throws Exception {
         // testsuite/integration/basic/src/test/java/org/jboss/as/test/integration/security/loginmodules/RunAsLoginModuleTestCase.java
-        // op.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
-        
-        ModelNode address = new ModelNode();
-        address.add(SUBSYSTEM, "ejb3");
-        address.add("strict-max-bean-instance-pool", "slsb-strict-max-pool");
-        address.protect();
-        ModelNode operation = new ModelNode();
-        operation.get(OP_ADDR).set(address);
-        operation.get(OP).set(WRITE_ATTRIBUTE_OPERATION);
-        operation.get(NAME).set("max-pool-size");
-        operation.get(VALUE).set("2000");
-        ModelNode result =  client.getControllerClient().execute(operation);
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        log.info("After reloading: " + result);
-        System.out.println("After reloading: " + result);
-        
-        operation = new ModelNode();
-        operation.get(OP_ADDR).set(address);
+        // op.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);        
         
         ModelNode op = new ModelNode();
         op.get(OP).set("reload");
-        // op.get(ADMIN_ONLY).set(true);
-        result =  client.getControllerClient().execute(op);
+        op.get(ADMIN_ONLY).set(true);
+        ModelNode result =  client.getControllerClient().execute(op);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         log.info("After reloading: " + result);
         System.out.println("After reloading: " + result);
+       
         
-        Thread.sleep(5000);
+        Thread.sleep(6000);
 
-        ModelNode rop = createOpNode(null, READ_ATTRIBUTE_OPERATION);
+        // ModelControllerClient client2 = ModelControllerClient.Factory.create(InetAddress.getByName("localhost"), 9999);
+        ModelNode rop = new ModelNode();
+        rop.get(OP).set(READ_ATTRIBUTE_OPERATION);
         rop.get(NAME).set("server-state");
-        result = client.getControllerClient().execute(op);
+        result = client.getControllerClient().execute(rop);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         log.info("Server state: " + result);
         System.out.println("Server state: " + result);
-        
-        throw new IllegalAccessError();
     }
 }
