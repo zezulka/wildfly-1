@@ -52,7 +52,7 @@ import org.junit.runner.RunWith;
  * @author Ondrej Chaloupka
  */
 @RunWith(Arquillian.class)
-// @ServerSetup(SSLRealmSetupTask.class)
+@ServerSetup(SSLRealmSetupTask.class)
 @RunAsClient
 public class SSLEJBRemoteClientTestCase {
     private static final Logger log = Logger.getLogger(SSLEJBRemoteClientTestCase.class);
@@ -80,15 +80,15 @@ public class SSLEJBRemoteClientTestCase {
             System.setProperty("javax.net.ssl.trustStore", SSLRealmSetupTask.KEYSTORE_ABSOLUTE_PATH + SSLRealmSetupTask.TRUSTSTORE_CLIENT_FILENAME);
             System.setProperty("javax.net.ssl.trustStorePassword", SSLRealmSetupTask.KEYSTORE_PASSWORD);
             System.setProperty("javax.net.debug", "all"); 
-            // System.setProperty("javax.net.ssl.keyStore", SSLRealmSetupTask.KEYSTORE_CLIENT_FILENAME);
-         
-            // Taken properties defined to use SSL
-            // previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
+            // not necessary probably: System.setProperty("javax.net.ssl.keyStore", SSLRealmSetupTask.KEYSTORE_CLIENT_FILENAME);
             
             Properties env = new Properties();
             env.setProperty(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
             
             InitialContext ctx = new InitialContext(env);
+            
+            // Taken properties defined to use SSL
+            previousSelector = EJBClientContextSelector.setup(SSLRealmSetupTask.KEYSTORE_RELATIVE_PATH + File.separator + "jboss-ejb-client.properties");
             
             StatelessBeanRemote bean = (StatelessBeanRemote) ctx.lookup(String.format("ejb:/%s//%s!%s", 
                     MODULE_NAME, StatelessBean.class.getSimpleName(), StatelessBeanRemote.class.getName()));

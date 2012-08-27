@@ -23,13 +23,16 @@
 package org.jboss.as.test.integration.ejb.remote.ssl;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.test.integration.management.util.ModelUtil.createOpNode;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.as.test.integration.jca.JcaMgmtBase;
+import org.jboss.as.test.shared.RetryTaskExecutor;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.junit.Assert;
@@ -54,6 +57,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
     public static final String AUTHENTICATION_PROPERTIES_RELATIVE_TO = "jboss.server.config.dir";
     
 
+    /* -----------------  GETTING ModelNode addresses ----------------- */
     public static ModelNode getSecurityRealmsAddress() {
         ModelNode address = new ModelNode();
         address.add(CORE_SERVICE, MANAGEMENT);
@@ -83,28 +87,37 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         return address;
     }
     
+    
+    
+    /* -----------------  ManagementClient help methods ----------------- */
     /**
      * Inspiration from {@link JcaMgmtBase}
      */
     public static void reload(final ManagementClient managementClient) throws Exception {
         ModelNode operation = new ModelNode();
         operation.get(OP).set("reload");
+        operation.get(ADMIN_ONLY).set(true);
         ModelNode result = managementClient.getControllerClient().execute(operation);
-        log.info("Operation :reload executed with result " + result);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
+        
+        /* log.info("Operation 'reload' executed with result " + result);
         boolean reloaded = false;
         int i = 0;
         while (!reloaded) {
             try {
-                Thread.sleep(5000);
-                if (managementClient.isServerInRunningState())
+                Thread.sleep(8000);
+                if (managementClient.isServerInRunningState()) {
                     reloaded = true;
+                } else {
+                    log.debug("Server is not running...");
+                }
             } catch (Throwable t) {
                 // nothing to do, just waiting
             } finally {
                 if (!reloaded && i++ > 10)
                     throw new Exception("Server reloading failed");
             }
-        }
+        } */
     }
 
     /**
@@ -123,6 +136,8 @@ public class SSLRealmSetupTask implements ServerSetupTask {
     }
    
     
+    
+    /* -----------------  SetupTask methods ----------------- */
     /**
     * <security-realm name="SSLRealm">
     *    <server-identities>
@@ -148,7 +163,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
 
         // Adding ssl attribute
-        // /core-service=management/security-realm=SSLRealmOndra/server-identity=ssl:add(
+        // /core-service=management/security-realm=SSLRealmSomename/server-identity=ssl:add(
         //   keystore-password=123456, keystore-relative-to=jboss.server.config.dir, keystore-path=keystore)
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         URL resourcesUrl = tccl.getResource("");
@@ -162,11 +177,11 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         // operation.get("keystore-relative-to").set(KEYSTORE_ABSOLUTE_PATH);
         operation.get("keystore-path").set(KEYSTORE_ABSOLUTE_PATH + File.separator + KEYSTORE_SERVER_FILENAME);
         result = managementClient.getControllerClient().execute(operation);
-        log.infof("Setting server-identity ssl for realm %s (password %s, keystore path %s%s%s) with result %s", SECURITY_REALM_NAME,
+        log.infof("Setting server-identity ssl for realm %s (password %s, keystore path %s) with result %s", SECURITY_REALM_NAME,
                 KEYSTORE_PASSWORD, KEYSTORE_ABSOLUTE_PATH, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         reload(managementClient);
-        Thread.sleep(10000);
+        Thread.sleep(20000);
           
         operation = new ModelNode();
         operation.get(OP_ADDR).set(getRemotingConnectorAddress());
