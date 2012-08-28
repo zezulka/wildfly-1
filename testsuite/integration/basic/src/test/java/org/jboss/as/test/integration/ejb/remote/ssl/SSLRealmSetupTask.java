@@ -100,7 +100,8 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         ModelNode result = managementClient.getControllerClient().execute(operation);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         log.info("Operation 'reload' executed with result " + result);
-        boolean reloaded = false;
+        Thread.sleep(4000);
+        /* boolean reloaded = false;
         int i = 0;
         while (!reloaded) {
             try {
@@ -116,7 +117,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
                 if (!reloaded && i++ < 6)
                     throw new Exception("Server reloading failed");
             }
-        }
+        } */
     }
 
     /**
@@ -129,9 +130,11 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         operation.get(OP).set(WRITE_ATTRIBUTE_OPERATION);
         operation.get(NAME).set("security-realm");
         operation.get(VALUE).set(realmName);
+        operation.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
         ModelNode result = managementClient.getControllerClient().execute(operation);
-        log.infof("Setting security realm %s to remoting connector with result %s", SSLRealmSetupTask.SECURITY_REALM_NAME, result);
+        log.infof("Setting security realm %s to remoting connector subsystem with result %s", SSLRealmSetupTask.SECURITY_REALM_NAME, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
+        reload(managementClient);
     }
    
     
@@ -182,10 +185,24 @@ public class SSLRealmSetupTask implements ServerSetupTask {
                 KEYSTORE_PASSWORD, KEYSTORE_ABSOLUTE_PATH, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         
+        
         // reload(managementClient);
-        Thread.sleep(2000);
+        // Thread.sleep(2000);
+        
+        // Adding authentication attribute to SSLRealm
+        // authentication=properties:add(path=application-users.properties, relative-to=jboss.server.config.dir)
+        operation = new ModelNode();
+        operation.get(OP_ADDR).set(getSecurityRealmsAddressAuthentication());
+        operation.get(OP).set(ADD);
+        operation.get(PATH).set(AUTHENTICATION_PROPERTIES_PATH);
+        operation.get(RELATIVE_TO).set(AUTHENTICATION_PROPERTIES_RELATIVE_TO);
+        operation.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
+        result = managementClient.getControllerClient().execute(operation);
+        log.infof("Adding authentication as properties files to security realm %s (path %s, relative to %s) with result %s", 
+                SECURITY_REALM_NAME, AUTHENTICATION_PROPERTIES_PATH, AUTHENTICATION_PROPERTIES_RELATIVE_TO, result);
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
           
-        // Getting current security realm name  
+        // Reading current security realm name  
         operation = new ModelNode();
         operation.get(OP_ADDR).set(getRemotingConnectorAddress());
         operation.get(OP).set(READ_ATTRIBUTE_OPERATION);
@@ -195,19 +212,7 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         PREVIOUS_SECURITY_REALM_NAME = result.get("result").asString();
         
-        // Adding authentication attribute
-        // authentication=properties:add(path=application-users.properties, relative-to=jboss.server.config.dir)
-        operation = new ModelNode();
-        operation.get(OP_ADDR).set(getSecurityRealmsAddressAuthentication());
-        operation.get(OP).set(ADD);
-        operation.get(PATH).set(AUTHENTICATION_PROPERTIES_PATH);
-        operation.get(RELATIVE_TO).set(AUTHENTICATION_PROPERTIES_RELATIVE_TO);
-        result = managementClient.getControllerClient().execute(operation);
-        log.infof("Setting authentication of %s (path %s, relative to %s) with result %s", SECURITY_REALM_NAME,
-                AUTHENTICATION_PROPERTIES_PATH, AUTHENTICATION_PROPERTIES_RELATIVE_TO, result);
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        
-        // Passing ssl realm to remote connector
+        // Set SSLRealm to remote connector (subsystem remote connector)
         setRemotingConnectorRealm(managementClient, SECURITY_REALM_NAME);
     }
 
@@ -223,12 +228,11 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         ModelNode operation = new ModelNode();
         operation.get(OP_ADDR).set(secRealmAddress);
         operation.get(OP).set(REMOVE);
+        operation.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
         ModelNode result = managementClient.getControllerClient().execute(operation);
         log.infof("Removing security realm %s with result %s", SECURITY_REALM_NAME, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         
         setRemotingConnectorRealm(managementClient, PREVIOUS_SECURITY_REALM_NAME);
-        
-        reload(managementClient);
     }
 }
