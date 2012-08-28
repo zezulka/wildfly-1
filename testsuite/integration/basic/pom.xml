@@ -114,7 +114,7 @@
             -->
             <build>
                 <plugins>
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>xml-maven-plugin</artifactId>
                         <executions>
@@ -149,7 +149,7 @@
                                 </transformationSet>
                             </transformationSets>
                         </configuration>
-                    </plugin>
+                    </plugin>-->
 
                     <!-- Build the target/jbossas server configuration. -->
                     <plugin>
