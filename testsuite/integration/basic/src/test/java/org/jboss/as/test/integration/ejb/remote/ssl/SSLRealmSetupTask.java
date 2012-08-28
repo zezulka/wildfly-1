@@ -96,16 +96,15 @@ public class SSLRealmSetupTask implements ServerSetupTask {
     public static void reload(final ManagementClient managementClient) throws Exception {
         ModelNode operation = new ModelNode();
         operation.get(OP).set("reload");
-        operation.get(ADMIN_ONLY).set(true);
+        // operation.get(ADMIN_ONLY).set(true);
         ModelNode result = managementClient.getControllerClient().execute(operation);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        
-        /* log.info("Operation 'reload' executed with result " + result);
+        log.info("Operation 'reload' executed with result " + result);
         boolean reloaded = false;
         int i = 0;
         while (!reloaded) {
             try {
-                Thread.sleep(8000);
+                Thread.sleep(2000);
                 if (managementClient.isServerInRunningState()) {
                     reloaded = true;
                 } else {
@@ -114,10 +113,10 @@ public class SSLRealmSetupTask implements ServerSetupTask {
             } catch (Throwable t) {
                 // nothing to do, just waiting
             } finally {
-                if (!reloaded && i++ > 10)
+                if (!reloaded && i++ < 6)
                     throw new Exception("Server reloading failed");
             }
-        } */
+        }
     }
 
     /**
@@ -176,13 +175,17 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         KEYSTORE_ABSOLUTE_PATH =  resourcePath + KEYSTORE_RELATIVE_PATH;
         // operation.get("keystore-relative-to").set(KEYSTORE_ABSOLUTE_PATH);
         operation.get("keystore-path").set(KEYSTORE_ABSOLUTE_PATH + File.separator + KEYSTORE_SERVER_FILENAME);
+        // hot reload - normal reload does not work
+        operation.get(OPERATION_HEADERS).get(ALLOW_RESOURCE_SERVICE_RESTART).set(true);
         result = managementClient.getControllerClient().execute(operation);
         log.infof("Setting server-identity ssl for realm %s (password %s, keystore path %s) with result %s", SECURITY_REALM_NAME,
                 KEYSTORE_PASSWORD, KEYSTORE_ABSOLUTE_PATH, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
-        reload(managementClient);
-        Thread.sleep(20000);
+        
+        // reload(managementClient);
+        Thread.sleep(2000);
           
+        // Getting current security realm name  
         operation = new ModelNode();
         operation.get(OP_ADDR).set(getRemotingConnectorAddress());
         operation.get(OP).set(READ_ATTRIBUTE_OPERATION);
@@ -202,13 +205,20 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         result = managementClient.getControllerClient().execute(operation);
         log.infof("Setting authentication of %s (path %s, relative to %s) with result %s", SECURITY_REALM_NAME,
                 AUTHENTICATION_PROPERTIES_PATH, AUTHENTICATION_PROPERTIES_RELATIVE_TO, result);
-        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());        
+        Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
+        
+        // Passing ssl realm to remote connector
+        setRemotingConnectorRealm(managementClient, SECURITY_REALM_NAME);
     }
 
     @Override
     public void tearDown(final ManagementClient managementClient, final String containerId) throws Exception {
+        
+        // FIXME: remove me
+        if(true) return;
+        
         // Removing security realm
-        /*ModelNode secRealmAddress = getSecurityRealmsAddress();
+        ModelNode secRealmAddress = getSecurityRealmsAddress();
         secRealmAddress.protect();
         ModelNode operation = new ModelNode();
         operation.get(OP_ADDR).set(secRealmAddress);
@@ -217,6 +227,8 @@ public class SSLRealmSetupTask implements ServerSetupTask {
         log.infof("Removing security realm %s with result %s", SECURITY_REALM_NAME, result);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         
-        reload(managementClient); */
+        setRemotingConnectorRealm(managementClient, PREVIOUS_SECURITY_REALM_NAME);
+        
+        reload(managementClient);
     }
 }
