@@ -20,27 +20,35 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-
 package org.jboss.as.test.integration.web.valve;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name="HelloServlet", urlPatterns={"/"})
-public class HelloServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.valves.ValveBase;
+import org.jboss.logging.Logger;
 
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException {
-        PrintWriter out = response.getWriter();
-        out.println("HelloServlet");
+public class TestValve extends ValveBase {
+    private static final Logger log = Logger.getLogger(TestValve.class);
+
+    private String testparam = "DEFAULT_VALUE";
+
+    public void setTestparam(String testparam) {
+        this.testparam = testparam;
+    }
+    
+    public String getTestparam() {
+        return this.testparam;
     }
 
+    public void invoke(Request request, Response response)
+        throws IOException, ServletException {
+        response.addHeader("valve", testparam);
+        log.info("Valve " + TestValve.class.getName() + " was hit and adding header parameter 'valve' with value " + testparam);
+        getNext().invoke(request, response);
+    }
 }
+
