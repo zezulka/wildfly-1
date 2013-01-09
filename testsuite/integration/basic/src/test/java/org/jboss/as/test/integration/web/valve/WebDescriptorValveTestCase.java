@@ -72,6 +72,7 @@ public class WebDescriptorValveTestCase {
         @Override
         public void tearDown(final ManagementClient managementClient, final String containerId) throws Exception {
             ValveUtil.removeValve(managementClient, VALVE_NAME);
+            ValveUtil.reload(managementClient);
         }
     }
 

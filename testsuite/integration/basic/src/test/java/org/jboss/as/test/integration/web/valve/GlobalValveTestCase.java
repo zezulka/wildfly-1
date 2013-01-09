@@ -74,6 +74,7 @@ public class GlobalValveTestCase {
         public void tearDown(final ManagementClient managementClient, final String containerId) throws Exception {
             ValveUtil.removeValve(managementClient, VALVE_NAME_1);
             ValveUtil.removeValve(managementClient, VALVE_NAME_2);
+            ValveUtil.reload(managementClient);
         }
     }
 
@@ -94,6 +95,7 @@ public class GlobalValveTestCase {
         Header[] valveHeaders = ValveUtil.hitValve(url);
         assertEquals("There was one valve defined - it's missing now", 1, valveHeaders.length);
         assertEquals("One valve with not defined param expecting default param value", DEFAULT_PARAM_VALUE, valveHeaders[0].getValue());
+        log.info("testValveOne - OK");
     }
 
     @Test
@@ -107,8 +109,11 @@ public class GlobalValveTestCase {
         log.debug("Testing url " + url + " against two valves named " + VALVE_NAME_1 + " and " + VALVE_NAME_2);
         Header[] valveHeaders = ValveUtil.hitValve(url);
         assertEquals("There were two global valves defined - it's missing now", 2, valveHeaders.length);
-                assertEquals("First valve is defined without parameter - default value expected", DEFAULT_PARAM_VALUE, valveHeaders[0].getValue());
-                assertEquals("Second valve has parameter which is expected to be returned", VALVE_NAME_2, valveHeaders[1].getValue());
+        log.info("First valve header: " + valveHeaders[0].getValue());
+        assertEquals("First valve is defined without parameter - default value expected", DEFAULT_PARAM_VALUE, valveHeaders[0].getValue());
+        log.info("Second valve header: " + valveHeaders[1].getValue());
+        assertEquals("Second valve has parameter which is expected to be returned", VALVE_NAME_2, valveHeaders[1].getValue());
+        log.info("testValveTwo - OK");
     }
     
     @Test
@@ -121,5 +126,6 @@ public class GlobalValveTestCase {
         Header[] valveHeaders = ValveUtil.hitValve(url);
         assertEquals("There is one active valve defined", 1, valveHeaders.length);
         assertEquals("Just second parametrized valve is active - defined param value is expected to be returned", VALVE_NAME_2, valveHeaders[0].getValue());
+        log.info("testValveDisabled - OK");
     }
 }
