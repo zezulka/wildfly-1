@@ -182,6 +182,7 @@
                                 <goals><goal>test</goal></goals>
                                 <configuration>
                                     <!-- Tests to execute. Overriden in webProfileExclusion.profile . -->
+<!--
                                     <includes>
                                         <include>org/jboss/as/test/integration/ee/remotelookup/*TestCase*.java</include>
                                         <include>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</include>
@@ -202,6 +203,12 @@
                                         <include>org/jboss/as/test/integration/ee/injection/resource/enventry/EnvEntryTestCase.java</include>
                                         <include>org/jboss/as/test/integration/ee/injection/resource/basic/*TestCase.java</include>
                                     </includes>
+-->
+<includes>
+<include>org/jboss/as/test/integration/web/valve/GlobalValveTestCase.java</include>
+<include>org/jboss/as/test/integration/security/jacc/JACCForEarModulesTestCase.java</include>
+<include>org/jboss/as/test/integration/security/jacc/JACCAuthzPropagationTestCase.java</include>
+</includes>
 
                                     <!-- Parameters to test cases. -->
                                     <systemPropertyVariables>
@@ -219,90 +226,6 @@
                                 </configuration>
                             </execution>
 
-                            <execution>
-                                <id>basic-integration-default-web.surefire</id>
-                                <phase>test</phase>
-                                <goals><goal>test</goal></goals>
-                                <configuration>
-                                    <!-- Tests to execute. Overriden in webProfileExclusion.profile . -->
-                                    <excludes>
-                                    	<!-- truststore setting used in LDAPs testing is affected by some other test -->
-                                        <exclude>org/jboss/as/test/integration/security/loginmodules/Ldap*LoginModuleTestCase.java</exclude>
-                                        <!-- 2nd run tests are run in other execution. -->
-                                        <exclude>org/jboss/as/test/integration/**/*SecondTestCase.java</exclude>
-                                        <!-- Tests which need FULL config. -->
-                                        <exclude>org/jboss/as/test/integration/ee/remotelookup/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/iiop/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/*/security/**/*TestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/mdb/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/pool/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/entity/cmp/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/remote/entity/cmp/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/management/deployments/*TestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ejb/transaction/bmt/lazyenlist</exclude>
-                                        <exclude>org/jboss/as/test/integration/jaxr/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/jca/bootstrap/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/messaging/**/*TestCase*.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/management/cli/HelpTestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/management/cli/JmsTestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/naming/remote/**/*TestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ee/injection/resource/resourceref/*TestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ee/injection/resource/enventry/EnvEntryTestCase.java</exclude>
-                                        <exclude>org/jboss/as/test/integration/ee/injection/resource/basic/*TestCase.java</exclude>
-                                    </excludes>
-
-                                    <!-- Parameters to test cases. -->
-                                    <systemPropertyVariables>
-                                        <jboss.server.config.file.name>standalone.xml</jboss.server.config.file.name>
-                                        <jboss.inst>${basedir}/target/jbossas</jboss.inst>
-                                    </systemPropertyVariables>
-
-                                    <additionalClasspathElements>
-                                        <additionalClasspathElement>${project.basedir}/../src/test/resources</additionalClasspathElement>
-                                    </additionalClasspathElements>
-
-                                    <!--<reportNameSuffix>tests-basic-integration-default</reportNameSuffix>-->
-                                </configuration>
-                            </execution>
-
-                            <!-- The second run tests rely on restoring timer services setup in the first run of tests. -->
-                            <execution>
-                                <id>basic-integration-2nd.surefire</id>
-                                <phase>test</phase>
-                                <goals><goal>test</goal></goals>
-                                <configuration>
-                                    <skipTests>${ts.skipTests}</skipTests>
-                                    <redirectTestOutputToFile>${testLogToFile}</redirectTestOutputToFile>
-                                    <enableAssertions>true</enableAssertions>
-                                    <includes>
-                                        <include>org/jboss/as/test/integration/**/*SecondTestCase.java</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>none</exclude>
-                                    </excludes>
-                                </configuration>
-                            </execution>
-
-                            <!-- truststore setting used in LDAPs testing was affected by some other test - need an extra run -->
-                            <execution>
-                                <id>basic-integration-ldap.surefire</id>
-                                <phase>test</phase>
-                                <goals><goal>test</goal></goals>
-                                <configuration>
-                                    <includes>
-                                        <include>org/jboss/as/test/integration/security/loginmodules/Ldap*LoginModuleTestCase.java</include>                                        
-                                    </includes>
-                                    
-                                    <systemPropertyVariables>
-                                        <jboss.server.config.file.name>standalone.xml</jboss.server.config.file.name>
-                                        <jboss.inst>${basedir}/target/jbossas</jboss.inst>
-                                    </systemPropertyVariables>
-
-                                    <additionalClasspathElements>
-                                        <additionalClasspathElement>${project.basedir}/../src/test/resources</additionalClasspathElement>
-                                    </additionalClasspathElements>                                    
-                                </configuration>
-                            </execution>
                         </executions>
 
                     </plugin>
@@ -371,9 +294,11 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <executions>
                             <execution><id>basic-integration-default-full.surefire</id><phase>test</phase></execution>
+                            <!--
                             <execution><id>basic-integration-default-web.surefire</id><phase>none</phase></execution>
                             <execution><id>basic-integration-2nd.surefire</id><phase>none</phase></execution>
                             <execution><id>basic-integration-ldap.surefire</id><phase>none</phase></execution>
+                            -->
                         </executions>
                     </plugin>
                 </plugins>
