@@ -99,6 +99,8 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
 
     private final boolean immediateValidation = Boolean.getBoolean("immediate.expression.validation");
     private final boolean logHandling = Boolean.getBoolean("expression.logging");
+    
+    private static final String DEFAULT_PROPNAME = "exp.test";
 
     /**
      * Launch a master HC in --admin-only. Iterate through all resources, converting any writable attribute that
@@ -135,6 +137,24 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
         System.out.println("complex property: " + complexProperty);
         System.out.println();
 
+        // let's try to set exp.test system value       
+        final ModelNode propAddress = new ModelNode();
+        propAddress.add("system-property", DEFAULT_PROPNAME);
+        propAddress.protect();
+        final ModelNode propOperation = new ModelNode();
+        propOperation.get(OP).set("add");
+        propOperation.get(OP_ADDR).set(propAddress);
+        propOperation.get("value").set("42");
+        ModelNode a = domainMasterLifecycleUtil.getDomainClient().execute(propOperation);
+        System.out.println("ondra result: " + a);
+        
+        ModelNode opget = new ModelNode();
+        opget.get("operation").set("read-attribute");
+        opget.get("address").set(propAddress);
+        opget.get("name").set("value");
+        a = domainMasterLifecycleUtil.getDomainClient().execute(opget);
+        System.out.println("ondra result: " + a);
+        
         // restart back to normal mode
         ModelNode op = new ModelNode();
         op.get(OP_ADDR).add(HOST, "master");
@@ -147,6 +167,14 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
 
         // check that the servers are up
         domainMasterLifecycleUtil.awaitServers(System.currentTimeMillis());
+        
+        opget = new ModelNode();
+        opget.get("operation").set("read-attribute");
+        opget.get("address").set(propAddress);
+        opget.get("name").set("value");
+        a = domainMasterLifecycleUtil.getDomainClient().execute(opget);
+        System.out.println("result: " + a);
+        System.out.println("result resolving: " + a.resolve());
 
         validateExpectedValues(PathAddress.EMPTY_ADDRESS, expectedValues, "master");
     }
@@ -241,9 +269,11 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
         // Store the modified values for confirmation after HC reload
         expectedValues.put(address, expectedAttrs);
 
+        int i=3;
         // Recurse into children, being careful about what processes we are touching
         boolean isHost = address.size() == 1 && HOST.equals(address.getLastElement().getKey());
         for (Property descProp : description.get(CHILDREN).asPropertyList()) {
+            if(i>0) i--; else break;
             String childType = descProp.getName();
             if (isHost && SERVER.equals(childType)) {
                 continue;
@@ -326,7 +356,7 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
                         if (attrType == ModelType.STRING) {
                             checkForUnconvertedExpression(address, attrName, attrValue);
                         }
-                        String expression = "${exp.test:" + attrValue.asString() + "}";
+                        String expression = "${" + DEFAULT_PROPNAME + ":" + attrValue.asString() + "}";
                         expressionAttrs.put(attrName, new ModelNode(expression));
                         expectedAttrs.put(attrName, new ModelNode().setExpression(expression));
                         simple++;
@@ -456,7 +486,7 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
                         if (propValType == ModelType.STRING) {
                             checkForUnconvertedExpression(address, attrName, propVal);
                         }
-                        String expression = "${exp.test:" + propVal.asString() + "}";
+                        String expression = "${" + DEFAULT_PROPNAME + ":" + propVal.asString() + "}";
                         updated.get(prop.getName()).set(expression);
                         expected.get(prop.getName()).set(new ModelNode().setExpression(expression));
                         hasExpression = true;
@@ -470,7 +500,7 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
                     if (itemType == ModelType.STRING) {
                         checkForUnconvertedExpression(address, attrName, item);
                     }
-                    String expression = "${exp.test:" + item.asString() + "}";
+                    String expression = "${" + DEFAULT_PROPNAME + ":" + item.asString() + "}";
                     updated.add(expression);
                     expected.add(new ModelNode().setExpression(expression));
                     hasExpression = true;
@@ -611,7 +641,7 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
                     checkForUnconvertedExpression(address, attrName, item);
                 }
                 String valueString = timeunit ? fieldValue.asString().toLowerCase() : fieldValue.asString();
-                String expression = "${exp.test:" + valueString + "}";
+                String expression = "${" + DEFAULT_PROPNAME + ":" + valueString + "}";
                 updatedItem.get(fieldName).set(expression);
                 itemToExpect.get(fieldName).set(new ModelNode().setExpression(expression));
                 changed = true;
@@ -705,6 +735,7 @@ public class ExpressionSupportSmokeTestCase extends BuildConfigurationTestBase {
             case EXPRESSION: {
                 Assert.assertEquals(address + " attribute " + attrName + " value " + modelValue + " is an unconverted expression",
                         expectedValue, modelValue);
+                System.out.println("modelValue: " + modelValue + ", resolved: " + modelValue.resolve());
                 break;
             }
             case INT:
