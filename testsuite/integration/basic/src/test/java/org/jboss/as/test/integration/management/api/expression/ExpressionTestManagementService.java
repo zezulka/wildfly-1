@@ -53,7 +53,7 @@ public class ExpressionTestManagementService implements ServiceActivator {
 
        public static ModelControllerClient getTestExpressionClient() {
           ModelControllerClient client = controller.createClient(executor);
-          log.info("Returning controller: " + controller + " and client " + client);
+          log.debug("Returning controller: " + controller + " and client " + client);
           return client;
        }
 

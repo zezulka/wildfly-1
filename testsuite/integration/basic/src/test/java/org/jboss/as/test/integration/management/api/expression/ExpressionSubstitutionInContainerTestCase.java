@@ -25,13 +25,14 @@ package org.jboss.as.test.integration.management.api.expression;
 import java.io.File;
 
 import javax.ejb.EJB;
-import javax.inject.Inject;
 
 import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.container.ManagementClient;
+import org.jboss.as.test.integration.management.base.AbstractMgmtServerSetupTask;
 import org.jboss.as.test.integration.management.util.ModelUtil;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
@@ -40,10 +41,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -53,16 +50,29 @@ import org.junit.runner.RunWith;
  * @author <a href="ochaloup@jboss.com">Ondrej Chaloupka</a> 
  */
 @RunWith(Arquillian.class)
+@ServerSetup(ExpressionSubstitutionInContainerTestCase.PropertiesTestCaseSetup.class)
 public class ExpressionSubstitutionInContainerTestCase {
     private static final Logger log = Logger.getLogger(ExpressionSubstitutionInContainerTestCase.class);
     
     private static final String ARCHIVE_NAME = "expression-substitution-test";
-    private static boolean isSystemPropertyCreated = false;
     
     private static final String TEST_PROP_NAME = "qa.test.property";
     private static final String TEST_PROP_DEFAULT_VALUE = "defaultValue";
     private static final String TEST_EXPRESSION_PROP_NAME = "qa.test.exp";
     private static final String TEST_EXPRESSION_PROP_VALUE = "expression.value";
+    
+    static class PropertiesTestCaseSetup extends AbstractMgmtServerSetupTask {
+        @Override
+        protected void doSetup(ManagementClient managementClient) throws Exception {
+            Utils.setProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
+            Utils.setProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
+        }
+        @Override
+        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
+            Utils.removeProperty(TEST_EXPRESSION_PROP_NAME, managementClient.getControllerClient());
+            Utils.removeProperty(TEST_PROP_NAME, managementClient.getControllerClient());
+        }        
+    }
     
     @EJB(mappedName = "java:global/expression-substitution-test/StatelessBean")
     private static IStatelessBean bean;
@@ -72,6 +82,7 @@ public class ExpressionSubstitutionInContainerTestCase {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, ARCHIVE_NAME + ".war");
         war.addClasses(ExpressionTestManagementService.class, Utils.class, ModelUtil.class, 
                 ServletTest.class, IStatelessBean.class, StatelessBean.class);
+        war.addPackage(AbstractMgmtServerSetupTask.class.getPackage());
         
         war.addAsManifestResource(new StringAsset(ExpressionTestManagementService.class.getName()),
                 "services/org.jboss.msc.service.ServiceActivator");
@@ -88,22 +99,6 @@ public class ExpressionSubstitutionInContainerTestCase {
         war.as(ZipExporter.class).exportTo(testPackage, true);
         
         return war;
-    }
-    
-    
-    @Before
-    public void setup() throws Exception {
-        if(!isSystemPropertyCreated) {
-            bean.addJBossProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE);
-            bean.addJBossProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}");
-            isSystemPropertyCreated = true;
-        }
-    }
-        
-    @AfterClass
-    public static void tearDown() throws Exception {
-        bean.removeJBossProperty(TEST_EXPRESSION_PROP_NAME);
-        bean.removeJBossProperty(TEST_PROP_NAME);
     }
     
     @Test
