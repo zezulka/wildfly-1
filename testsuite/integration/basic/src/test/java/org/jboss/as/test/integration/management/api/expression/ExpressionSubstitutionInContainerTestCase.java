@@ -44,11 +44,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * The expression substitution test which run the evaluation of expression in bean in deployed in container. 
+ * Validation of the system property substitution for expressions handling. Test for AS7-6120.
+ * Global parameters testing could be found in domain module: ExpressionSupportSmokeTestCase
  * 
+ * The expression substitution test runs the evaluation of expressions in bean deployed in container. 
  * The managementClient injected by arquillian is taken via remote interface
  * We need to operate directly with management client controller residing in container. 
  * It's provided by management service hack - {@link ExpressionTestManagementService} 
+ * Maybe there will be an api for this in future: AS7-4657 
  * 
  * @author <a href="ochaloup@jboss.com">Ondrej Chaloupka</a> 
  */
