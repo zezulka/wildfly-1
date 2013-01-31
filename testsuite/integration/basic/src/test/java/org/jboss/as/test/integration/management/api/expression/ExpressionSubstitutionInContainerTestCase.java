@@ -30,9 +30,8 @@ import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.container.ManagementClient;
-import org.jboss.as.test.integration.management.base.AbstractMgmtServerSetupTask;
 import org.jboss.as.test.integration.management.util.ModelUtil;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
@@ -47,10 +46,13 @@ import org.junit.runner.RunWith;
 /**
  * The expression substitution test which run the evaluation of expression in bean in deployed in container. 
  * 
+ * The managementClient injected by arquillian is taken via remote interface
+ * We need to operate directly with management client controller residing in container. 
+ * It's provided by management service hack - {@link ExpressionTestManagementService} 
+ * 
  * @author <a href="ochaloup@jboss.com">Ondrej Chaloupka</a> 
  */
 @RunWith(Arquillian.class)
-@ServerSetup(ExpressionSubstitutionInContainerTestCase.PropertiesTestCaseSetup.class)
 public class ExpressionSubstitutionInContainerTestCase {
     private static final Logger log = Logger.getLogger(ExpressionSubstitutionInContainerTestCase.class);
     
@@ -60,29 +62,18 @@ public class ExpressionSubstitutionInContainerTestCase {
     private static final String TEST_PROP_DEFAULT_VALUE = "defaultValue";
     private static final String TEST_EXPRESSION_PROP_NAME = "qa.test.exp";
     private static final String TEST_EXPRESSION_PROP_VALUE = "expression.value";
-    
-    static class PropertiesTestCaseSetup extends AbstractMgmtServerSetupTask {
-        @Override
-        protected void doSetup(ManagementClient managementClient) throws Exception {
-            Utils.setProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
-            Utils.setProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
-        }
-        @Override
-        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
-            Utils.removeProperty(TEST_EXPRESSION_PROP_NAME, managementClient.getControllerClient());
-            Utils.removeProperty(TEST_PROP_NAME, managementClient.getControllerClient());
-        }        
-    }
-    
+        
     @EJB(mappedName = "java:global/expression-substitution-test/StatelessBean")
-    private static IStatelessBean bean;
+    private IStatelessBean bean;
+    
+    @ArquillianResource
+    private ManagementClient managementClient;
     
     @Deployment
     public static Archive<?> deploy() {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, ARCHIVE_NAME + ".war");
         war.addClasses(ExpressionTestManagementService.class, Utils.class, ModelUtil.class, 
                 ServletTest.class, IStatelessBean.class, StatelessBean.class);
-        war.addPackage(AbstractMgmtServerSetupTask.class.getPackage());
         
         war.addAsManifestResource(new StringAsset(ExpressionTestManagementService.class.getName()),
                 "services/org.jboss.msc.service.ServiceActivator");
@@ -101,8 +92,41 @@ public class ExpressionSubstitutionInContainerTestCase {
         return war;
     }
     
+   
     @Test
-    public void test() {
+    public void propertyDefinedFirst() {
+        Utils.setProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
+        Utils.setProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
+        expresionEvaluation();
+        
+        // removing tested properties
+        Utils.removeProperty(TEST_EXPRESSION_PROP_NAME, managementClient.getControllerClient());
+        Utils.removeProperty(TEST_PROP_NAME, managementClient.getControllerClient());
+    }
+    
+    @Test
+    public void expressionDefinedFirst() {
+        Utils.setProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
+        Utils.setProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
+        expresionEvaluation();
+        
+        // removing tested properties
+        Utils.removeProperty(TEST_EXPRESSION_PROP_NAME, managementClient.getControllerClient());
+        Utils.removeProperty(TEST_PROP_NAME, managementClient.getControllerClient());
+    }
+    
+    @Test
+    public void systemPropertyEvaluation() {
+        // the system property has to be defined in the same VM as the container resides
+        bean.addSystemProperty(TEST_EXPRESSION_PROP_NAME, TEST_EXPRESSION_PROP_VALUE);
+        Utils.setProperty(TEST_PROP_NAME, "${" + TEST_EXPRESSION_PROP_NAME + ":" + TEST_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
+        expresionEvaluation();
+        
+        // removing tested properties
+        Utils.removeProperty(TEST_PROP_NAME, managementClient.getControllerClient());
+    }
+    
+    private void expresionEvaluation() {
         String result = bean.getJBossProperty(TEST_EXPRESSION_PROP_NAME);
         log.infof("JBoss property %s was resolved to %s", TEST_EXPRESSION_PROP_NAME, result);
         Assert.assertEquals(TEST_EXPRESSION_PROP_VALUE, result);
