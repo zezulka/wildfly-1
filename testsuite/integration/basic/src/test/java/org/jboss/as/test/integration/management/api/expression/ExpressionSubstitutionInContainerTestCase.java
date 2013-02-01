@@ -150,23 +150,47 @@ public class ExpressionSubstitutionInContainerTestCase {
         Utils.setProperty(PROP_NAME, "${" + EXPRESSION_PROP_NAME + ":" + PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
         
         try {
-            // test resolution of expressions        
-            String result = bean.getJBossProperty(PROP_NAME);
-            log.infof("systemPropertyEvaluation: JBoss property %s was resolved to %s", PROP_NAME, result);
-            Assert.assertEquals("jboss property " + PROP_NAME + " evaluation - value should be taken from system property", EXPRESSION_PROP_VALUE, result);
-            
-    
-            result = bean.getSystemProperty(EXPRESSION_PROP_NAME);
-            log.infof("systemPropertyEvaluationsystemPropertyEvaluation: System property %s has value %s", EXPRESSION_PROP_NAME, result);
-            Assert.assertEquals("system property " + EXPRESSION_PROP_NAME + " from directly defined system property", EXPRESSION_PROP_VALUE, result);
-            
-            result = bean.getSystemProperty(PROP_NAME);
-            log.infof("systemPropertyEvaluation:  System property %s has value %s", PROP_NAME, result);
-            Assert.assertEquals("system property " + PROP_NAME + " from evaluated jboss property", EXPRESSION_PROP_VALUE, result);
+            systemPropertyEvaluation();
         } finally {
             // removing tested properties
             Utils.removeProperty(PROP_NAME, managementClient.getControllerClient());
         }
+    }
+    
+    
+    /**
+     *  <system-properties>
+     *    <property name="qa.test.property" value="${qa.test.exp:defaultValue}"/>
+     * </system-properties>
+     */
+    @Test
+    public void testSystemPropertyEvaluationSetAfterExpression() {
+        Utils.setProperty(PROP_NAME, "${" + EXPRESSION_PROP_NAME + ":" + PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
+        // the system property has to be defined in the same VM as the container resides
+        bean.addSystemProperty(EXPRESSION_PROP_NAME, EXPRESSION_PROP_VALUE);
+        
+        try {
+            systemPropertyEvaluation();
+        } finally {
+            // removing tested properties
+            Utils.removeProperty(PROP_NAME, managementClient.getControllerClient());
+        }
+    }
+    
+    private void systemPropertyEvaluation() {
+        // test resolution of expressions        
+        String result = bean.getJBossProperty(PROP_NAME);
+        log.infof("systemPropertyEvaluation: JBoss property %s was resolved to %s", PROP_NAME, result);
+        Assert.assertEquals("jboss property " + PROP_NAME + " evaluation - value should be taken from system property", EXPRESSION_PROP_VALUE, result);
+        
+
+        result = bean.getSystemProperty(EXPRESSION_PROP_NAME);
+        log.infof("systemPropertyEvaluationsystemPropertyEvaluation: System property %s has value %s", EXPRESSION_PROP_NAME, result);
+        Assert.assertEquals("system property " + EXPRESSION_PROP_NAME + " from directly defined system property", EXPRESSION_PROP_VALUE, result);
+        
+        result = bean.getSystemProperty(PROP_NAME);
+        log.infof("systemPropertyEvaluation:  System property %s has value %s", PROP_NAME, result);
+        Assert.assertEquals("system property " + PROP_NAME + " from evaluated jboss property", EXPRESSION_PROP_VALUE, result);
     }
     
     /**
@@ -177,10 +201,10 @@ public class ExpressionSubstitutionInContainerTestCase {
       *  </system-properties>
      */
     @Test
-    public void setInnerExpression() {
+    public void testMultipleLevelExpression() {
         Utils.setProperty(EXPRESSION_PROP_NAME, EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
         Utils.setProperty(INNER_PROP_NAME, "${" + EXPRESSION_PROP_NAME + ":" + INNER_PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
-        Utils.setProperty(PROP_NAME, "${" + INNER_PROP_NAME + ":" + PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());        
+        Utils.setProperty(PROP_NAME, "${" + INNER_PROP_NAME + ":" + PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
                 
         try {
             // evaluation the inner prop name in addition
@@ -211,8 +235,9 @@ public class ExpressionSubstitutionInContainerTestCase {
      * Write attribute set:
      * <property name="qa.test.exp" value="expression.value"/>
      */
+    @Ignore("AS7-6431")  // for this test works there will be :reload after redefinition
     @Test
-    public void redefinitionExpressionValue() {
+    public void testRedefinitionExpressionValue() {
         Utils.setProperty(EXPRESSION_PROP_NAME, "firstly.defined.value.", managementClient.getControllerClient());
         Utils.setProperty(PROP_NAME, "${" + EXPRESSION_PROP_NAME + ":" + PROP_DEFAULT_VALUE + "}", managementClient.getControllerClient());
         Utils.redefineProperty(EXPRESSION_PROP_NAME, EXPRESSION_PROP_VALUE, managementClient.getControllerClient());
