@@ -42,14 +42,14 @@ public class StatelessBean implements IStatelessBean {
 	@Override
 	public void addJBossProperty(String name, String value) {
 	    ModelControllerClient client = getClient();
-	    log.debug("Adding system property " + name + " with value " + value + " via client " + client);
+	    log.debugf("Adding jboss property %s with value %s via client %s", name, value, client);
 	    Utils.setProperty(name, value, client);
 	}
 	
 	@Override
 	public void removeJBossProperty(String name) {
 	    ModelControllerClient client = getClient();
-	    log.debug("Removing system property " + name + " via client " + client);
+	    log.debugf("Removing jboss property %s via client %s", name, client);
 	    Utils.removeProperty(name, client);
 	}
 	
@@ -59,6 +59,13 @@ public class StatelessBean implements IStatelessBean {
 		String result = Utils.getProperty(name, client);
 		log.debug("JBoss sytem property " + name + " was resolved to be " + result);
 		return result;
+	}
+	
+	@Override
+	public void redefineJBossProperty(String name, String value) {
+	    ModelControllerClient client = getClient();
+	    log.debugf("Redefine jboss property %s with value %s via client %s", name, value, client);
+        Utils.redefineProperty(name, value, client);
 	}
 
     @Override

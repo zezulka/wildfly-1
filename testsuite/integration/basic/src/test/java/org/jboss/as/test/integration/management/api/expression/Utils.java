@@ -45,21 +45,35 @@ public class Utils {
         ModelNode modelNode = createOpNode("system-property=" + name, ADD);
         modelNode.get(VALUE).set(value);
         ModelNode result = executeOp(modelNode, client);
-        log.debug("Added property " + name + ", result: " + result);
+        log.debugf("Added property %s, result: %s", name, result);
     }
     
     public static void removeProperty(String name, ModelControllerClient client) {
         ModelNode modelNode = createOpNode("system-property=" + name, REMOVE);
         ModelNode result = executeOp(modelNode, client);
-        log.debug("Removing property " + name + ", result: " + result);
+        log.debugf("Removing property %s. Result: %s.", name, result);
+    }
+    
+    public static void redefineProperty(String name, String value, ModelControllerClient client) {
+        ModelNode modelNode = createOpNode("system-property=" + name, WRITE_ATTRIBUTE_OPERATION);
+        modelNode.get(NAME).set(VALUE);
+        modelNode.get(VALUE).set(value);
+        ModelNode result = executeOp(modelNode, client);
+        log.debugf("Redefine property %s to value %s. Result: %s.", name, value, result);
     }
     
     public static ModelNode executeOp(ModelNode op, ModelControllerClient client) {
+        ModelNode modelNodeResult;
         try {
-            return client.execute(op);
+            modelNodeResult = client.execute(op);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+        
+        if(!SUCCESS.equals(modelNodeResult.get(OUTCOME).asString())) {
+            throw new RuntimeException("Management operation: " + op + " was not succesful. Result was: " + modelNodeResult);
+        }
+        return modelNodeResult;
     }
     
     public static String getProperty(String name, ModelControllerClient client) {
@@ -69,7 +83,7 @@ public class Utils {
         ModelNode result = executeOp(modelNode, client);
         Assert.assertEquals(SUCCESS, result.get(OUTCOME).asString());
         ModelNode resolvedResult = result.resolve();
-        log.debug("Resolved property " + name+ ": " + resolvedResult);
+        log.debugf("Resolved property %s with result: %s", name, resolvedResult);
         Assert.assertEquals(SUCCESS, resolvedResult.get(OUTCOME).asString());
         return resolvedResult.get("result").asString();
     }

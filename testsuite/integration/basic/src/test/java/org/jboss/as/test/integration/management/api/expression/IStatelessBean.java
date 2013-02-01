@@ -26,6 +26,7 @@ public interface IStatelessBean {
   void addJBossProperty(String name, String value);
   void removeJBossProperty(String name);
   String getJBossProperty(String name);
+  void redefineJBossProperty(String name, String value);
   
   void addSystemProperty(String name, String value);
   void removeSystemProperty(String name);
