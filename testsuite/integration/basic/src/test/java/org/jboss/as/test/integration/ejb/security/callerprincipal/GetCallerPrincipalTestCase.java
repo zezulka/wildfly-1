@@ -72,11 +72,11 @@ import javax.naming.NamingException;
 /**
  * The Bean Provider can invoke the getCallerPrincipal and isCallerInRole methods only
  * in the enterprise bean’s business methods as specified in Table 1 on page 94, Table 2 on page 103,
- * Table 4 on page 149, Table 5 on page 231, and Table 11 on page 303. If they are otherwise invoked
- * when no security context exists, they should throw the java.lang.IllegalStateException
- * runtime exception.
+ * Table 4 on page 149, Table 5 on page 231, and Table 11 on page 303.
+ * When Bean Provider invokes the mentioned methods in other business methods then container throws
+ * java.lang.IllegalStateException. This generally happens when no security context exists. 
  *
- * In case of no security context
+ * Cases when there is no security context:
  * Stateless - PostConstruct, PreDestroy
  * MDB - PostConstruct, PreDestroy
  * Entity Beans - ejbActivate, ebjPassivate
