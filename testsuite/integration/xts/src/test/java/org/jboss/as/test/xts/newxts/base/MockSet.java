@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.simple.wsba;
+package org.jboss.as.test.xts.newxts.base;
 
 import org.jboss.logging.Logger;
 
@@ -30,10 +30,10 @@ import java.util.Set;
 /**
  * This class represents a simple Set collection.
  *
- * @author paul.robinson@redhat.com, 2011-12-21
+ * @author paul.robinson@redhat.com
  */
-public class MockSetManager {
-    private static final Logger log = Logger.getLogger(MockSetManager.class);
+public class MockSet {
+    private static final Logger log = Logger.getLogger(MockSet.class);
 
     private static final Set<String> set = new HashSet<String>();
 
@@ -43,11 +43,11 @@ public class MockSetManager {
      * @param item Item to add to the set.
      * @throws AlreadyInSetException if the item is already in the set.
      */
-    public static void add(String item) throws AlreadyInSetException {
+    public static void add(String item) throws TestApplicationException {
         synchronized (set) {
 
             if (set.contains(item)) {
-                throw new AlreadyInSetException("item '" + item + "' is already in the set.");
+                throw new TestApplicationException("Item '" + item + "' is already in the set.");
             }
             set.add(item);
         }
@@ -83,7 +83,7 @@ public class MockSetManager {
      * @param item The item to remove from the set in order to undo the effects of the add operation.
      */
     public static void rollback(String item) {
-        log.info("[SERVICE] Compensate the backend resource by removing '" + item
+        log.info("Compensate the backend resource by removing '" + item
                 + "' from the set (e.g. undo any changes to databases that were previously made visible to others)");
         synchronized (set) {
 
