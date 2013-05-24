@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -32,7 +32,8 @@ public enum ServiceCommand {
     APPLICATION_EXCEPTION, 
     SYSTEM_EXCEPTION_ON_COMPLETE, 
     DO_COMPLETE, 
-    CANNOT_COMPLETE;
+    CANNOT_COMPLETE,
+    REUSE_BA_PARTICIPANT;
     
     /**
      * Utility method which just check array on existence of a ServiceCommand

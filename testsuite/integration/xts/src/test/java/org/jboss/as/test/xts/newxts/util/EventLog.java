@@ -24,29 +24,60 @@ package org.jboss.as.test.xts.newxts.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 public class EventLog implements Serializable {
 
-    private static volatile List<EventLogEvent> dataUnavailableLog = new ArrayList<EventLogEvent>();
-    private static volatile List<EventLogEvent> eventLog = new ArrayList<EventLogEvent>();
+    // Event logs for a name
+    private static volatile Map<String, List<EventLogEvent>> dataUnavailableLog = new HashMap<String, List<EventLogEvent>>();
+    private static volatile Map<String, List<EventLogEvent>> eventLog = new HashMap<String, List<EventLogEvent>>();
+    
+    private static final String UNKNOWN_EVENTLOG_NAME = "unknown";
 
-    public void addEvent(EventLogEvent event) {
-
-        eventLog.add(event);
+    /**
+     * Method checks whether the eventLogName exists in the datastore.
+     * In case that it exists - do nothing.
+     * In case that it does not exists - it creates the key with empty list of logged events.
+     * 
+     * @param eventLogName  name of key for events
+     */
+    public void foundEventLogName(String eventLogName) {
+        getListToModify(eventLogName, eventLog);
     }
     
+    public void addEvent(EventLogEvent event) {
+        addEvent(UNKNOWN_EVENTLOG_NAME, event);
+    }
+       
+    public void addEvent(String eventLogName, EventLogEvent event) {
+        getListToModify(eventLogName, eventLog).add(event);
+    }
+
     public void addDataUnavailable(EventLogEvent event) {
-        dataUnavailableLog.add(event);
+        addDataUnavailable(UNKNOWN_EVENTLOG_NAME, event);
+    }
+    
+    public void addDataUnavailable(String eventLogName, EventLogEvent event) {
+        getListToModify(eventLogName, dataUnavailableLog).add(event);
     }
 
     public List<EventLogEvent> getEventLog() {
-        return eventLog;
+        return getEventLog(UNKNOWN_EVENTLOG_NAME);
+    }
+    
+    public List<EventLogEvent> getEventLog(String eventLogName) {
+        return eventLog.get(eventLogName);
     }
     
     public List<EventLogEvent> getDataUnavailableLog() {
-        return dataUnavailableLog;
+        return getDataUnavailableLog(UNKNOWN_EVENTLOG_NAME);
+    }
+    
+    public List<EventLogEvent> getDataUnavailableLog(String eventLogName) {
+        return dataUnavailableLog.get(eventLogName);
     }
 
     public void clear() {
@@ -55,12 +86,22 @@ public class EventLog implements Serializable {
     }
 
     public static String asString(List<EventLogEvent> events) {
-
         String result = "";
 
         for (EventLogEvent logEvent : events) {
             result += logEvent.name() + ",";
         }
         return result;
+    }
+    
+    // --- helper method
+    private <T> List<T> getListToModify(String eventLogName, Map<String, List<T>> map) {
+        if(map.containsKey(eventLogName)) {
+            return map.get(eventLogName);
+        } else {
+            List<T> newList = new ArrayList<T>();
+            map.put(eventLogName, newList);
+            return newList;
+        }
     }
 }

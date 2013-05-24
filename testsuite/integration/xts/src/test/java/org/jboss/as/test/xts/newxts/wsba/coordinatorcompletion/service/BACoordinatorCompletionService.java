@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.service;
+package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletion.service;
 
 import org.jboss.as.test.xts.newxts.base.MockSet;
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
@@ -63,7 +63,7 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
     public void saveData(String value, ServiceCommand... serviceCommands) throws TestApplicationException {
 
         log.info("[BA COORDINATOR COMPL SERVICE] web method saveData('" + value + "')");
-
+        eventLog.foundEventLogName(value);
         BusinessActivityManager activityManager = BusinessActivityManagerFactory.businessActivityManager();
         
         // transaction context associated with this thread
@@ -75,13 +75,16 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
         }
 
          // Lookup existing participant or register new participant (
-        BACoordinationCompletitionParticipant participantBA = BACoordinationCompletitionParticipant.getParticipant(transactionId);
+        BACoordinationCompletionParticipant participantBA = BACoordinationCompletionParticipant.getSomeParticipant(transactionId);
 
-        if (participantBA == null) {
+        if (participantBA != null && ServiceCommand.isPresent(REUSE_BA_PARTICIPANT, serviceCommands)) {
+            log.info("[BA COORDINATOR COMPL SERVICE] Re-using the existing participant, already registered for this BA - command set to: " + 
+                    REUSE_BA_PARTICIPANT);
+        } else {
             try {
                 // enlist the Participant for this service:
-                participantBA = new BACoordinationCompletitionParticipant(serviceCommands, eventLog, transactionId, value);
-                BACoordinationCompletitionParticipant.recordParticipant(transactionId, participantBA);
+                participantBA = new BACoordinationCompletionParticipant(serviceCommands, eventLog, transactionId, value);
+                BACoordinationCompletionParticipant.recordParticipant(transactionId, participantBA);
 
                 log.info("[BA COORDINATOR COMPL SERVICE] Enlisting a participant into the BA");
                 BAParticipantManager baParticipantManager =  activityManager.enlistForBusinessAgreementWithCoordinatorCompletion(participantBA, 
@@ -93,7 +96,8 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
                 }
                 
                 if (ServiceCommand.isPresent(DO_COMPLETE, serviceCommands)) {
-                    baParticipantManager.completed();
+                    throw new RuntimeException("Only ParticipantCompletion participants are supposed to call complete. " +
+                    		"CoordinatorCompletion participants need to wait to be notified by the coordinator.");
                 }
 
             } catch (Exception e) {
@@ -101,8 +105,6 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
                 e.printStackTrace(System.err);
                 throw new RuntimeException("Error enlisting participant", e);
             }
-        } else {
-            log.info("[BA COORDINATOR COMPL SERVICE] Re-using the existing participant, already registered for this BA");
         }
         
         // calling a method on participant

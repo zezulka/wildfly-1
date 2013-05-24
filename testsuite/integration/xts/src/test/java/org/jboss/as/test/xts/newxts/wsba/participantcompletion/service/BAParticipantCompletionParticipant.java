@@ -1,24 +1,26 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- * 
- * (C) 2005-2006,
- * @author JBoss Inc.
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2013, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.xts.newxts.wsba.participantcompletition.service;
+
+package org.jboss.as.test.xts.newxts.wsba.participantcompletion.service;
 
 import com.arjuna.wst.BusinessAgreementWithParticipantCompletionParticipant;
 import com.arjuna.wst.FaultedException;
@@ -43,10 +45,10 @@ import java.io.Serializable;
  * 
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
-public class BAParticipantCompletitionParticipant 
+public class BAParticipantCompletionParticipant 
         implements BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger log = Logger.getLogger(BAParticipantCompletitionParticipant.class);
+    private static final Logger log = Logger.getLogger(BAParticipantCompletionParticipant.class);
     
     private String value;
     // Service command which define behaving of the participant
@@ -60,7 +62,7 @@ public class BAParticipantCompletitionParticipant
      * 
      * @param value the value to remove from the set during compensation
      */
-    public BAParticipantCompletitionParticipant(ServiceCommand[] serviceCommands, EventLog eventLog, String value) {
+    public BAParticipantCompletionParticipant(ServiceCommand[] serviceCommands, EventLog eventLog, String value) {
         this.value = value;
         this.eventLog = eventLog;
         this.serviceCommands = serviceCommands;
@@ -79,7 +81,7 @@ public class BAParticipantCompletitionParticipant
      */
 
     public void close() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.CLOSE);
+        eventLog.addEvent(value, EventLogEvent.CLOSE);
         // The participant knows that this BA is now finished and can throw away any temporary state
         // nothing to do here as the item has already been added to the set
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant close() - logged: " + EventLogEvent.CLOSE);
@@ -94,7 +96,7 @@ public class BAParticipantCompletitionParticipant
      */
 
     public void cancel() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.CANCEL);
+        eventLog.addEvent(value, EventLogEvent.CANCEL);
         // The participant should compensate any work done within this BA
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant cancel() - logged: " + EventLogEvent.CANCEL);
         // Compensate work
@@ -110,7 +112,7 @@ public class BAParticipantCompletitionParticipant
      */
 
     public void compensate() throws FaultedException, WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.COMPENSATE);
+        eventLog.addEvent(value, EventLogEvent.COMPENSATE);
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant compensate() - logged: " + EventLogEvent.COMPENSATE);
         // Compensate work done by the service
         MockSet.rollback(value);
@@ -118,12 +120,12 @@ public class BAParticipantCompletitionParticipant
 
     @Deprecated
     public void unknown() throws SystemException {
-        eventLog.addEvent(EventLogEvent.UNKNOWN);
+        eventLog.addEvent(value, EventLogEvent.UNKNOWN);
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant unknown() - logged: " + EventLogEvent.UNKNOWN);
     }
 
     public void error() throws SystemException {
-        eventLog.addEvent(EventLogEvent.ERROR);
+        eventLog.addEvent(value, EventLogEvent.ERROR);
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant error() - logged: " + EventLogEvent.ERROR);
         // Compensate work done by the service
         MockSet.rollback(value);
@@ -140,7 +142,7 @@ public class BAParticipantCompletitionParticipant
         log.info("[BA PARTICIPANT COMPL SERVICE] Participant confirmCompleted(" + Boolean.toString(confirmed) + ")");
         if (confirmed) {
             // This tells the participant that compensation information has been logged and that it is safe to commit any changes
-            eventLog.addEvent(EventLogEvent.CONFIRM_COMPLETED);
+            eventLog.addEvent(value, EventLogEvent.CONFIRM_COMPLETED);
             log.info("[BA PARTICIPANT COMPL SERVICE] Participant confirmCompleted(true) - logged: " + EventLogEvent.CONFIRM_COMPLETED);
             MockSet.commit();
         } else {

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.participantcompletition.client;
+package org.jboss.as.test.xts.newxts.wsba.participantcompletion.client;
 
 import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mw.wst11.UserBusinessActivityFactory;
@@ -31,7 +31,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.test.xts.newxts.base.BaseFunctionalTest;
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
 import org.jboss.as.test.xts.newxts.util.EventLog;
-import org.jboss.as.test.xts.newxts.wsba.participantcompletition.service.BAParticipantCompletion;
+import org.jboss.as.test.xts.newxts.wsba.participantcompletion.service.BAParticipantCompletion;
 import org.jboss.jbossts.xts.bytemanSupport.BMScript;
 import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
 import org.jboss.shrinkwrap.api.Archive;
@@ -93,83 +93,126 @@ public class BAParticipantCompletionTestCase extends BaseFunctionalTest {
 
     @After
     public void teardownTest() throws Exception {
-        assertDataAvailable(client);
         client.clearEventLog();
         client.clearData();
         cancelIfActive(uba);
     }
 
     @Test
-    public void testWSBAParticipantComplete() throws Exception {
+    public void testWSBAParticipantCompleteSingle() throws Exception {
         ParticipantCompletionCoordinatorRules.setParticipantCount(1);
 
         uba.begin();
-        client.saveData("test", DO_COMPLETE);
+        client.saveData("single", DO_COMPLETE);
         uba.close();
 
-        assertOrder(client, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("single", client, CONFIRM_COMPLETED, CLOSE);
     }
-
+    
     @Test
-    public void testWSBAParticipantCompleteClose() throws Exception {
+    public void testWSBAParticipantComplete() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
+        uba.begin();
+        client.saveData("complete1", DO_COMPLETE);
+        client.saveData("complete2", DO_COMPLETE);
+        client.saveData("complete3", DO_COMPLETE);
+        uba.close();
+
+        assertOrder("complete1", client, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("complete2", client, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("complete3", client, CONFIRM_COMPLETED, CLOSE);
+    }
+    
+    @Test
+    public void testWSBAParticipantDoNotComplete() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         try {
             uba.begin();
-            client.saveData("test");  // no completition here!
+            client.saveData("notcomplete1", DO_COMPLETE);
+            client.saveData("notcomplete2", DO_COMPLETE);
+            client.saveData("notcomplete3");  // this participant does not inform about correct completition
             uba.close();
+            
             Assert.fail("Exception should have been thrown by now");
-        } catch (TransactionRolledBackException e) {
-            // TODO: why no COMPENSATE is called?
-            assertOrder(client);
+        } catch(TransactionRolledBackException e) {
+            // we expect this :)
         }
+
+        assertOrder("notcomplete1", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("notcomplete2", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("notcomplete3", client, CANCEL);
     }
 
-    
-    @Test
-    public void testWSBAParticipantMultiInvoke() throws Exception {
-        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
-
-        uba.begin();
-        client.saveData("test1");
-        client.saveData("test2", DO_COMPLETE);
-        uba.close();
-
-        assertOrder(client, CONFIRM_COMPLETED, CLOSE);
-    }
-    
     @Test
     public void testWSBAParticipantClientCancel() throws Exception {
         uba.begin();
-        client.saveData("test", DO_COMPLETE);
+        client.saveData("participantclientcancel1", DO_COMPLETE);
+        client.saveData("participantclientcancel2", DO_COMPLETE);
+        client.saveData("participantclientcancel3", DO_COMPLETE);
         uba.cancel();
 
-        assertOrder(client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantclientcancel1", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantclientcancel2", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantclientcancel3", client, CONFIRM_COMPLETED, COMPENSATE);
+    }
+    
+    @Test
+    public void testWSBAParticipantClientCancelNotComplete() throws Exception {
+        uba.begin();
+        client.saveData("participantclientcancel1", DO_COMPLETE);
+        client.saveData("participantclientcancel2");
+        client.saveData("participantclientcancel3", DO_COMPLETE);
+        uba.cancel();
+
+        assertOrder("participantclientcancel1", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantclientcancel2", client, CANCEL);
+        assertOrder("participantclientcancel3", client, CONFIRM_COMPLETED, COMPENSATE);
     }
 
     @Test
     public void testWSBAParticipantApplicationException() throws Exception {
         try {
             uba.begin();
-            client.saveData("test", APPLICATION_EXCEPTION);
+            client.saveData("participantappexception1", DO_COMPLETE);
+            client.saveData("participantappexception2", DO_COMPLETE);
+            client.saveData("participantappexception3", APPLICATION_EXCEPTION);
+            
             Assert.fail("Exception should have been thrown by now");
         } catch (TestApplicationException e) {
-            // TODO: is the test app exception ok? - don't we expect SOAPFaultException
-            // This is OK - exception expected
+            // Exception is expected
         } finally {
             uba.cancel();
         }
-        assertOrder(client, CANCEL);
+        
+        assertOrder("participantappexception1", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantappexception2", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("participantappexception3", client, CANCEL);
     }
 
-    @Test(expected = TransactionRolledBackException.class)
+    @Test
     public void testWSBAParticipantCannotComplete() throws Exception {
         try {
             uba.begin();
-            client.saveData("test", CANNOT_COMPLETE);
-            uba.close();
-        } catch (TransactionRolledBackException e) {
-            // TODO: there is no cancel called - is this OK?
-            assertOrder(client);
-            throw e;
+            client.saveData("cannotcomplete1", DO_COMPLETE);
+            client.saveData("cannotcomplete2", CANNOT_COMPLETE);
+            client.saveData("cannotcomplete3", DO_COMPLETE);
+            
+            Assert.fail("Exception should have been thrown by now");
+        } catch (javax.xml.ws.soap.SOAPFaultException sfe) {
+            // Exception is expected - enlisting participant #3 can't be done
         }
+        
+        try {
+            uba.close();
+        } catch(TransactionRolledBackException e) {
+            // Exception is expected - rollback on close because of cannotComplete
+        }
+        
+        // TODO: CANCEL here?
+        assertOrder("cannotcomplete1", client, CONFIRM_COMPLETED, COMPENSATE);
+        assertOrder("cannotcomplete2", client);
+        assertOrder("cannotcomplete3", client);
     }
 }

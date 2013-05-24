@@ -62,8 +62,8 @@ public class BaseFunctionalTest {
     
     
     // ---- Test result checking
-    protected void assertOrder(BaseServiceInterface client, EventLogEvent... expectedOrder) {
-        Assert.assertEquals(Arrays.asList(expectedOrder), client.getEventLog().getEventLog());
+    protected void assertOrder(String eventLogName, BaseServiceInterface client, EventLogEvent... expectedOrder) {
+        Assert.assertEquals(Arrays.asList(expectedOrder), client.getEventLog().getEventLog(eventLogName));
     }
     
     protected void assertDataAvailable(BaseServiceInterface client)

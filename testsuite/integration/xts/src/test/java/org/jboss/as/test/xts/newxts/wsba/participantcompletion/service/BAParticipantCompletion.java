@@ -20,25 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.service;
-
-import javax.jws.WebMethod;
+package org.jboss.as.test.xts.newxts.wsba.participantcompletion.service;
 
 import org.jboss.as.test.xts.newxts.base.BaseServiceInterface;
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
 import org.jboss.as.test.xts.newxts.util.EventLog;
 import org.jboss.as.test.xts.newxts.util.ServiceCommand;
 
-public interface BACoordinatorCompletion extends BaseServiceInterface {
-    
+import javax.ejb.Remote;
+import javax.jws.WebMethod;
+
+@Remote
+public interface BAParticipantCompletion extends BaseServiceInterface {
+
     @WebMethod
     public void saveData(String value, ServiceCommand... serviceCommands) throws TestApplicationException;
 
+    @WebMethod
+    public void clearData();
+    
     @Override
     @WebMethod
     public EventLog getEventLog();
 
-    
+    @Override
     @WebMethod
     public void clearEventLog();
 

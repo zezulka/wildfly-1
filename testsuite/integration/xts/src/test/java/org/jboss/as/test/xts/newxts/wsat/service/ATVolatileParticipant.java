@@ -30,7 +30,9 @@ import org.jboss.as.test.xts.newxts.util.ServiceCommand;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,9 +43,10 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
     private static final long serialVersionUID = 1L;
     
     // Is participant already enlisted to transaction?
-    private static Map<String, ATVolatileParticipant> activeParticipants = new HashMap<String, ATVolatileParticipant>();
+    private static Map<String, List<ATVolatileParticipant>> activeParticipants = new HashMap<String, List<ATVolatileParticipant>>();
     String transactionId;
 
+    private String participantName;
     // Service command which define behaving of the participant
     private ServiceCommand[] serviceCommands;
     // Where to log participant activity
@@ -52,16 +55,12 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
     /**
      * Creates a new participant for this transaction. Participants and transaction instances have a one-to-one mapping.
      */
-    public ATVolatileParticipant(ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
+    public ATVolatileParticipant(String participantName, ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
         this.serviceCommands = serviceCommands;
         this.eventLog = eventLog;
+        this.participantName = participantName;
         
-        if(ATVolatileParticipant.isEnlisted(transactionId)) {
-            throw new RuntimeException(this.getClass().getName() + " can't be enlisted to transaction " + transactionId + " because it already is enlisted.");
-        } else {
-          this.transactionId = transactionId;
-          activeParticipants.put(transactionId, this);
-        }
+        addParticipant(transactionId);
     }
 
    
@@ -75,7 +74,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
     @Override
     // TODO: added option for System Exception would be thrown?
     public Vote prepare() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.BEFORE_PREPARE);
+        eventLog.addEvent(participantName, EventLogEvent.BEFORE_PREPARE);
         log.info("[AT SERVICE] Volatile participant prepare() - logged: " + EventLogEvent.BEFORE_PREPARE);
 
         if(ServiceCommand.isPresent(ServiceCommand.VOTE_ROLLBACK_PRE_PREPARE, serviceCommands)) {
@@ -99,7 +98,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override
     public void commit() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.VOLATILE_COMMIT);
+        eventLog.addEvent(participantName, EventLogEvent.VOLATILE_COMMIT);
         log.info("[AT SERVICE] Volatile participant commit() - logged: " + EventLogEvent.VOLATILE_COMMIT);
     }
 
@@ -112,14 +111,14 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override
     public void rollback() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.VOLATILE_ROLLBACK);
+        eventLog.addEvent(participantName, EventLogEvent.VOLATILE_ROLLBACK);
         log.info("[AT SERVICE] Volatile participant rollback() - logged: " + EventLogEvent.VOLATILE_ROLLBACK);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void unknown() throws SystemException {
-        eventLog.addEvent(EventLogEvent.UNKNOWN);
+        eventLog.addEvent(participantName, EventLogEvent.UNKNOWN);
         log.info("[AT SERVICE] Volatile participant unknown() - logged: " + EventLogEvent.UNKNOWN);
     }
 
@@ -128,13 +127,30 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override    
     public void error() throws SystemException {
-        eventLog.addEvent(EventLogEvent.ERROR);
+        eventLog.addEvent(participantName, EventLogEvent.ERROR);
         log.info("[AT SERVICE] Volatile participant error() - logged: " + EventLogEvent.ERROR);
     }
     
     
     // --- private helper methods ---
-    public static boolean isEnlisted(String transactionId) {
-        return activeParticipants.containsKey(transactionId);
+    public static boolean isEnlisted(String transactionId, ATVolatileParticipant participant) {
+        if(activeParticipants.containsKey(transactionId)) {
+            return activeParticipants.get(transactionId).contains(participant);
+        } else {
+            return false;
+        }
+    }
+    
+    private void addParticipant(String transactionId) {
+        if(activeParticipants.containsKey(transactionId)) {
+            if(activeParticipants.get(transactionId).contains(this)) {
+                throw new RuntimeException(this.getClass().getName() + " can't be enlisted to transaction " + transactionId + " because it already is enlisted.");
+            }
+            activeParticipants.get(transactionId).add(this);
+        } else {
+            List<ATVolatileParticipant> participants = new ArrayList<ATVolatileParticipant>();
+            participants.add(this);
+            activeParticipants.put(transactionId, participants);
+        }
     }
 }

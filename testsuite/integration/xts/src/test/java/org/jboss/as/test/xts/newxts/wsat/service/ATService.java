@@ -35,20 +35,16 @@ import com.arjuna.mw.wst11.UserTransactionFactory;
 import com.arjuna.wst.UnknownTransactionException;
 import com.arjuna.wst.WrongStateException;
 
-import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.annotation.WebServlet;
-import javax.transaction.SystemException;
 
 
 @WebService(serviceName = "ATService", portName = "AT", name = "AT", targetNamespace = "http://www.jboss.com/jbossas/test/xts/wsat/at/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-// TODO: is needed to add handler to chain like this?
 @HandlerChain(file = "/context-handlers.xml")
-// TODO:  do not need to use web.xml - putting web service to this url - is it needed or @WebService does its work alone?
 @WebServlet(name="ATService", urlPatterns={"/ATService"})
 public class ATService {
     private static final Logger log = Logger.getLogger(ATService.class);
@@ -64,9 +60,10 @@ public class ATService {
      * @throws IllegalStateException 
      */
     @WebMethod
-    public void invoke(ServiceCommand[] serviceCommands) throws TestApplicationException {
+    public void invoke(String callName, ServiceCommand[] serviceCommands) throws TestApplicationException {
         
-        log.info("[AT SERVICE] web method invoke()");
+        log.infof("[AT SERVICE] web method invoke(%s)", callName);
+        eventLog.foundEventLogName(callName);
         UserTransaction userTransaction;
         
         try {
@@ -74,18 +71,16 @@ public class ATService {
             String transactionId = userTransaction.transactionIdentifier();
             System.out.println("RestaurantServiceAT transaction id =" + transactionId);
             
-            if(!ATVolatileParticipant.isEnlisted(transactionId)) {
-                // Enlist the Durable Participant for this service
-                TransactionManager transactionManager = TransactionManagerFactory.transactionManager();
-                ATDurableParticipant durableParticipant = new ATDurableParticipant(serviceCommands, eventLog, transactionId);
-                log.info("[SERVICE] Enlisting a Durable2PC participant into the AT");
-                transactionManager.enlistForDurableTwoPhase(durableParticipant, "ATServiceDurable:" + new Uid().toString());
-                
-                // Enlist the Volatile Participant for this service
-                ATVolatileParticipant volatileParticipant = new ATVolatileParticipant(serviceCommands, eventLog, transactionId);
-                log.info("[SERVICE] Enlisting a VolatilePC participant into the AT");
-                transactionManager.enlistForVolatileTwoPhase(volatileParticipant, "ATServiceVolatile:" + new Uid().toString());
-            }
+            // Enlist the Durable Participant for this service
+            TransactionManager transactionManager = TransactionManagerFactory.transactionManager();
+            ATDurableParticipant durableParticipant = new ATDurableParticipant(callName, serviceCommands, eventLog, transactionId);
+            log.info("[SERVICE] Enlisting a Durable2PC participant into the AT");
+            transactionManager.enlistForDurableTwoPhase(durableParticipant, "ATServiceDurable:" + new Uid().toString());
+            
+            // Enlist the Volatile Participant for this service
+            ATVolatileParticipant volatileParticipant = new ATVolatileParticipant(callName, serviceCommands, eventLog, transactionId);
+            log.info("[SERVICE] Enlisting a VolatilePC participant into the AT");
+            transactionManager.enlistForVolatileTwoPhase(volatileParticipant, "ATServiceVolatile:" + new Uid().toString());
         } catch (Exception e) {
             throw new RuntimeException("Error when enlisting participants", e);
         }

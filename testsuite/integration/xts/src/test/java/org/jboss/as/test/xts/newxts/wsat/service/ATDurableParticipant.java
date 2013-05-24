@@ -30,7 +30,9 @@ import org.jboss.as.test.xts.newxts.util.ServiceCommand;
 import org.jboss.logging.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,9 +43,10 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     private static final long serialVersionUID = 1L;
     
     // Is participant already enlisted to transaction?
-    private static Map<String, ATDurableParticipant> activeParticipants = new HashMap<String, ATDurableParticipant>();
+    private static Map<String, List<ATDurableParticipant>> activeParticipants = new HashMap<String, List<ATDurableParticipant>>();
     String transactionId;
 
+    private String participantName;
     // Service command which define behaving of the participant
     private ServiceCommand[] serviceCommands;
     // Where to log participant activity
@@ -53,16 +56,12 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     /**
      * Creates a new participant for this transaction. Participants and transaction instances have a one-to-one mapping.
      */
-    public ATDurableParticipant(ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
+    public ATDurableParticipant(String participantName, ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
         this.serviceCommands = serviceCommands;
         this.eventLog = eventLog;
+        this.participantName = participantName;
         
-        if(ATDurableParticipant.isEnlisted(transactionId)) {
-            throw new RuntimeException(this.getClass().getName() + " can't be enlisted to transaction " + transactionId + " because it already is enlisted.");
-        } else {
-          this.transactionId = transactionId;
-          ATDurableParticipant.activeParticipants.put(transactionId, this);
-        }
+        addParticipant(transactionId);
     }
 
    
@@ -76,7 +75,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     @Override
     // TODO: added option for System Exception would be thrown?
     public Vote prepare() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.PREPARE);
+        eventLog.addEvent(participantName, EventLogEvent.PREPARE);
         log.info("[AT SERVICE] Durable participant prepare() - logged: " + EventLogEvent.PREPARE);
 
         if(ServiceCommand.isPresent(ServiceCommand.VOTE_ROLLBACK, serviceCommands)) {
@@ -100,7 +99,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override
     public void commit() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.COMMIT);
+        eventLog.addEvent(participantName, EventLogEvent.COMMIT);
         log.info("[AT SERVICE] Durable participant commit() - logged: " + EventLogEvent.COMMIT);
         activeParticipants.remove(transactionId);
     }
@@ -114,7 +113,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override
     public void rollback() throws WrongStateException, SystemException {
-        eventLog.addEvent(EventLogEvent.ROLLBACK);
+        eventLog.addEvent(participantName, EventLogEvent.ROLLBACK);
         log.info("[AT SERVICE] Durable participant rollback() - logged: " + EventLogEvent.ROLLBACK);
         activeParticipants.remove(transactionId);
     }
@@ -122,7 +121,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     @SuppressWarnings("deprecation")
     @Override
     public void unknown() throws SystemException {
-        eventLog.addEvent(EventLogEvent.UNKNOWN);
+        eventLog.addEvent(participantName, EventLogEvent.UNKNOWN);
         log.info("[AT SERVICE] Durable participant unknown() - logged: " + EventLogEvent.UNKNOWN);
     }
 
@@ -131,13 +130,30 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override    
     public void error() throws SystemException {
-        eventLog.addEvent(EventLogEvent.ERROR);
+        eventLog.addEvent(participantName, EventLogEvent.ERROR);
         log.info("[AT SERVICE] Durable participant error() - logged: " + EventLogEvent.ERROR);
     }
     
     
-    // --- private helper methods ---
-    public static boolean isEnlisted(String transactionId) {
-        return ATDurableParticipant.activeParticipants.containsKey(transactionId);
+    // --- helper methods ---
+    public static boolean isEnlisted(String transactionId, ATDurableParticipant participant) {
+        if(activeParticipants.containsKey(transactionId)) {
+            return activeParticipants.get(transactionId).contains(participant);
+        } else {
+            return false;
+        }
+    }
+    
+    private void addParticipant(String transactionId) {
+        if(activeParticipants.containsKey(transactionId)) {
+            if(activeParticipants.get(transactionId).contains(this)) {
+                throw new RuntimeException(this.getClass().getName() + " can't be enlisted to transaction " + transactionId + " because it already is enlisted.");
+            }
+            activeParticipants.get(transactionId).add(this);
+        } else {
+            List<ATDurableParticipant> participants = new ArrayList<ATDurableParticipant>();
+            participants.add(this);
+            activeParticipants.put(transactionId, participants);
+        }
     }
 }

@@ -35,7 +35,7 @@ import org.jboss.as.test.xts.newxts.util.ServiceCommand;
 public interface AT extends BaseServiceInterface {
 
     @WebMethod
-    public void invoke(ServiceCommand... serviceCommands) throws TestApplicationException;
+    public void invoke(String callName, ServiceCommand... serviceCommands) throws TestApplicationException;
 
     @Override
     @WebMethod

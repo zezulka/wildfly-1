@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.participantcompletition.service;
+package org.jboss.as.test.xts.newxts.wsba.participantcompletion.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +70,8 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
     public void saveData(String value, ServiceCommand... serviceCommands) throws TestApplicationException {
 
         log.info("[BA PARTICIPANT COMPL SERVICE] invoked saveData('" + value + "')");
-
+        eventLog.foundEventLogName(value);
+        
         BAParticipantManager participantManager;
         BusinessActivityManager activityManager = BusinessActivityManagerFactory.businessActivityManager();
         String txid;
@@ -80,11 +81,14 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
         } catch (SystemException se) {
             throw new RuntimeException("Error on getting TX id from BussinessActivityManager", se);
         }
-
-        if(!participantRegistry.keySet().contains(txid)) {
+        
+        if(participantRegistry.keySet().contains(txid) && ServiceCommand.isPresent(REUSE_BA_PARTICIPANT, serviceCommands)) {
+            log.info("[BA PARTICIPANT COMPL SERVICE] Reusing BA participant manager - command: " + REUSE_BA_PARTICIPANT);
+            participantManager = participantRegistry.get(txid);
+        } else {
             try {
                 // Enlist the Participant for this service:
-                BAParticipantCompletitionParticipant participant = new BAParticipantCompletitionParticipant(serviceCommands, eventLog, value);
+                BAParticipantCompletionParticipant participant = new BAParticipantCompletionParticipant(serviceCommands, eventLog, value);
                 log.info("[BA PARTICIPANT COMPL SERVICE] Enlisting a participant into the BA");
                 participantManager = activityManager.enlistForBusinessAgreementWithParticipantCompletion(participant,
                         "BAParticipantCompletition:" + new Uid().toString());
@@ -94,8 +98,6 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
                 e.printStackTrace(System.err);
                 throw new RuntimeException("Error enlisting participant", e);
             }
-        } else {
-            participantManager = participantRegistry.get(txid);
         }
 
         if (ServiceCommand.isPresent(APPLICATION_EXCEPTION, serviceCommands)) {
@@ -133,7 +135,7 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
         if (ServiceCommand.isPresent(CANNOT_COMPLETE, serviceCommands)) {
             try {
                 // Tell the participant manager we cannot complete. This will force the activity to fail.
-                log.info("[BA PARTICIPANT COMPL SERVICE] Prepare failed, notifying coordinator that we cannot complete");
+                log.info("[BA PARTICIPANT COMPL SERVICE] Prepared fail, notifying coordinator that we cannot complete");
                 participantManager.cannotComplete();
                 return;
             } catch (Exception e) {

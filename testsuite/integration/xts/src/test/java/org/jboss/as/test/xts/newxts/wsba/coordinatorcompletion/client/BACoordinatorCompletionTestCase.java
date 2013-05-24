@@ -20,18 +20,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.client;
+package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletion.client;
 
 import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mw.wst11.UserBusinessActivityFactory;
-import com.arjuna.wst.TransactionRolledBackException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.test.xts.newxts.base.BaseFunctionalTest;
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
 import org.jboss.as.test.xts.newxts.util.EventLog;
-import org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.service.BACoordinatorCompletion;
+import org.jboss.as.test.xts.newxts.wsba.coordinatorcompletion.service.BACoordinatorCompletion;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -79,87 +78,95 @@ public class BACoordinatorCompletionTestCase extends BaseFunctionalTest {
 
     @After
     public void teardownTest() throws Exception {
-        assertDataAvailable(client);
         client.clearEventLog();
         cancelIfActive(uba);
     }
 
     @Test
-    public void testWSBACoordinatorSimple() throws Exception {
+    public void testWSBACoordinatorSingle() throws Exception {
         uba.begin();
-        client.saveData("test");
+        client.saveData("single");
         uba.close();
 
-        assertOrder(client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("single", client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
     }
 
     @Test
-    public void testWSBACoordinatorMultiInvoke() throws Exception {
+    public void testWSBACoordinatorSimple() throws Exception {
         uba.begin();
-        client.saveData("test1");
-        client.saveData("test2");
+        client.saveData("simple1");
+        client.saveData("simple2");
+        client.saveData("simple3");
         uba.close();
 
-        assertOrder(client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("simple1", client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("simple2", client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
+        assertOrder("simple3", client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
     }
 
     @Test
     public void testWSBACoordinatorClientCancel() throws Exception {
         uba.begin();
-        client.saveData("test");
+        client.saveData("clientcancel1");
+        client.saveData("clientcancel2");
+        client.saveData("clientcancel3");
         uba.cancel();
 
-        assertOrder(client, CANCEL);
+        assertOrder("clientcancel1", client, CANCEL);
+        assertOrder("clientcancel2", client, CANCEL);
+        assertOrder("clientcancel3", client, CANCEL);
     }
 
     @Test
     public void testWSBACoordinatorApplicationException() throws Exception {
         try {
             uba.begin();
-            client.saveData("test", APPLICATION_EXCEPTION);
+            client.saveData("applicationexception1");
+            client.saveData("applicationexception2");
+            client.saveData("applicationexception3", APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (TestApplicationException e) {
-            //TODO: is the test app exception ok? - don't we expect SOAPFaultException
             // This is OK - exception expected
         } finally {
             uba.cancel();
         }
-        // TODO: called cancel which seems to be OK, is it?
-        assertOrder(client, CANCEL);
+
+        assertOrder("applicationexception1", client, CANCEL);
+        assertOrder("applicationexception2", client, CANCEL);
+        assertOrder("applicationexception3", client, CANCEL);
     }
 
-    @Test(expected = TransactionRolledBackException.class)
+    @Test
     public void testWSBACoordinatorCannotComplete() throws Exception {
         try {
             uba.begin();
-            client.saveData("test", CANNOT_COMPLETE);
+            client.saveData("coordinatorcannotcomplete1");
+            client.saveData("coordinatorcannotcomplete2", CANNOT_COMPLETE);
+            client.saveData("coordinatorcannotcomplete3");
             uba.close();
-        } catch (TransactionRolledBackException e) {
-            assertOrder(client);
-            throw e;
+            
+            Assert.fail("Exception should have been thrown by now");
+        } catch (javax.xml.ws.soap.SOAPFaultException sfe) {
+            assertOrder("coordinatorcannotcomplete1", client);
+            assertOrder("coordinatorcannotcomplete2", client);
+            assertOrder("coordinatorcannotcomplete3", client);
         }
     }
-    
+
     @Test
-    public void testWSBACoordinatorDoComplete() throws Exception {
-        uba.begin();
-        client.saveData("test", DO_COMPLETE);
-        uba.close();
-
-        // TODO: there is confirmCompleted called with parameter "false" so rollback is called
-        //       at least in our participant - isn't that strange?
-        assertOrder(client, COMPLETE, CONFIRM_COMPLETED, CLOSE);
-    }
-
-    @Test(expected = TransactionRolledBackException.class)
     public void testWSBACoordinatorSystemExceptionOnComplete() throws Exception {
         try {
             uba.begin();
-            client.saveData("test", SYSTEM_EXCEPTION_ON_COMPLETE);
+            client.saveData("systemexceptiononcomplete1");
+            client.saveData("systemexceptiononcomplete2", SYSTEM_EXCEPTION_ON_COMPLETE);
+            client.saveData("systemexceptiononcomplete3");
             uba.close();
-        } catch (TransactionRolledBackException e) {
-            assertOrder(client, COMPLETE, CANCEL);   
-            throw e;
+            
+            Assert.fail("Exception should have been thrown by now");
+        } catch (com.arjuna.wst.TransactionRolledBackException trbe) {
+            assertOrder("systemexceptiononcomplete1", client, COMPLETE, CONFIRM_COMPLETED, COMPENSATE);
+            assertOrder("systemexceptiononcomplete2", client, COMPLETE, CANCEL);
+            assertOrder("systemexceptiononcomplete3", client, CANCEL);
         }
     }
 }

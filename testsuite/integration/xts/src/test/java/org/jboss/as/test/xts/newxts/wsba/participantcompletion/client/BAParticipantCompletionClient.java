@@ -20,39 +20,40 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.client;
+package org.jboss.as.test.xts.newxts.wsba.participantcompletion.client;
 
 import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
-
-import org.jboss.as.test.xts.newxts.wsba.coordinatorcompletition.service.BACoordinatorCompletion;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
+
+import org.jboss.as.test.xts.newxts.wsba.participantcompletion.service.BAParticipantCompletion;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BACoordinatorCompletionClient
+public class BAParticipantCompletionClient
 {
     private static final String NODE0_ADDR = System.getProperty("node0", "localhost");
     //TODO: parameterize this
     private static final int NODE0_PORT = 8080;
     
-    private static final String TARGET_NAMESPACE = "http://www.jboss.com/jbossas/test/xts/ba/coordinatorcompletion/";
+    private static final String TARGET_NAMESPACE = "http://www.jboss.com/jbossas/test/xts/ba/participantcompletion/";
     
     @SuppressWarnings("rawtypes")
-    public static BACoordinatorCompletion newInstance() throws Exception
+    public static BAParticipantCompletion newInstance() throws Exception
     {
-        URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + BACoordinatorCompletionTestCase.ARCHIVE_NAME + "/BACoordinatorCompletion?wsdl");
-        QName serviceName = new QName(TARGET_NAMESPACE, "BACoordinatorCompletionService");
-        QName portName = new QName(TARGET_NAMESPACE, "BACoordinatorCompletion");
+        URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + BAParticipantCompletionTestCase.ARCHIVE_NAME + "/BAParticipantCompletion?wsdl");
+        QName serviceName = new QName(TARGET_NAMESPACE, "BAParticipantCompletionService");
+        QName portName = new QName(TARGET_NAMESPACE, "BAParticipantCompletion");
 
         Service service = Service.create(wsdlLocation, serviceName);
         
         // Chain client handler
-        BACoordinatorCompletion client = service.getPort(portName, BACoordinatorCompletion.class);
+        BAParticipantCompletion client = service.getPort(portName, BAParticipantCompletion.class);
         BindingProvider bindingProvider = (BindingProvider) client;
         List<Handler> handlers = new ArrayList<Handler>(1);
         handlers.add(new JaxWSHeaderContextProcessor());

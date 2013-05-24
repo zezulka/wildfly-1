@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,10 +22,11 @@
 
 package org.jboss.as.test.xts.newxts.wsat.client;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 import com.arjuna.mw.wst11.UserTransaction;
 import com.arjuna.mw.wst11.UserTransactionFactory;
 import com.arjuna.wst.TransactionRolledBackException;
-import com.arjuna.wst.WrongStateException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -86,43 +87,52 @@ public class ATTestCase extends BaseFunctionalTest {
     }
 
     @Test
-    public void testWSATSimple() throws Exception {
+    public void testWSATSingleSimple() throws Exception {
         ut.begin();
-        client.invoke();
+        client.invoke("single");
         ut.commit();
 
-        assertOrder(client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
+        assertOrder("single", client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
     }
 
     @Test
-    public void testWSATSimpleMultiInvoke() throws Exception {
+    public void testWSATSimple() throws Exception {
         ut.begin();
-        client.invoke();
-        client.invoke();
+        client.invoke("simple1");
+        client.invoke("simple2");
+        client.invoke("simple3");
         ut.commit();
 
-        assertOrder(client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
+        assertOrder("simple1", client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
+        assertOrder("simple2", client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
+        assertOrder("simple3", client, BEFORE_PREPARE, PREPARE, COMMIT, VOLATILE_COMMIT);
     }
 
     @Test
     public void testWSATClientRollback() throws Exception {
         ut.begin();
-        client.invoke();
+        client.invoke("clientrollback1");
+        client.invoke("clientrollback2");
+        client.invoke("clientrollback3");
         ut.rollback();
 
-        //TODO: should rollback be called twice? once for volatile and once for durable - probinson
-        assertOrder(client, ROLLBACK, VOLATILE_ROLLBACK);
-
+        assertOrder("clientrollback1", client, ROLLBACK, VOLATILE_ROLLBACK);
+        assertOrder("clientrollback2", client, ROLLBACK, VOLATILE_ROLLBACK);
+        assertOrder("clientrollback2", client, ROLLBACK, VOLATILE_ROLLBACK);
     }
 
     @Test(expected = TransactionRolledBackException.class)
     public void testWSATVoteRollback() throws Exception {
         try {
             ut.begin();
-            client.invoke(VOTE_ROLLBACK);
+            client.invoke("voterollback1");
+            client.invoke("voterollback2", VOTE_ROLLBACK); // rollback voted on durable participant
+            client.invoke("voterollback3");
             ut.commit();
         } catch (TransactionRolledBackException e) {
-            assertOrder(client, BEFORE_PREPARE, PREPARE, VOLATILE_ROLLBACK);
+            assertOrder("voterollback1", client, BEFORE_PREPARE, PREPARE, ROLLBACK, VOLATILE_ROLLBACK);
+            assertOrder("voterollback2", client, BEFORE_PREPARE, PREPARE, VOLATILE_ROLLBACK);
+            assertOrder("voterollback3", client, BEFORE_PREPARE, ROLLBACK, VOLATILE_ROLLBACK);
             throw e;
         }
     }
@@ -131,66 +141,64 @@ public class ATTestCase extends BaseFunctionalTest {
     public void testWSATVoteRollbackPrePrepare() throws Exception {
         try {
             ut.begin();
-            client.invoke(VOTE_ROLLBACK_PRE_PREPARE);
+            client.invoke("voterollbackpreprepare1");
+            client.invoke("voterollbackpreprepare2", VOTE_ROLLBACK_PRE_PREPARE); // rollback voted on volatile participant
+            client.invoke("voterollbackpreprepare3");
             ut.commit();
         } catch (TransactionRolledBackException e) {
-            // TODO: is this ok assert order - where is the VOLATILE_ROLLBACK?
-            assertOrder(client, BEFORE_PREPARE, ROLLBACK);
+            // TODO: all different from spreadsheet
+            assertOrder("voterollbackpreprepare1", client, BEFORE_PREPARE, ROLLBACK, VOLATILE_ROLLBACK);
+            assertOrder("voterollbackpreprepare2", client, BEFORE_PREPARE, ROLLBACK);
+            assertOrder("voterollbackpreprepare3", client, ROLLBACK, VOLATILE_ROLLBACK);
             throw e;
-        }
-    }
-    
-    @Test(expected = WrongStateException.class)
-    public void testWSATRollbackOnly() throws Exception {
-        try {
-            ut.begin();
-            client.invoke(ROLLBACK_ONLY);
-            ut.commit();
-        } catch (WrongStateException wse) {
-            assertOrder(client, ROLLBACK, VOLATILE_ROLLBACK);
-            throw wse;
         }
     }
 
     @Test
-    public void testWSATVoteReadOnlyVolatile() throws Exception {
-        ut.begin();
-        client.invoke(VOTE_READONLY_VOLATILE); // volatile is bound to VOLATILE_COMMIT
-        ut.commit();
-    
-        assertOrder(client, BEFORE_PREPARE, PREPARE, COMMIT);
+    public void testWSATRollbackOnly() throws Exception {
+        try {
+            ut.begin();
+            client.invoke("rollbackonly1");
+            client.invoke("rollbackonly2", ROLLBACK_ONLY);
+            client.invoke("rollbackonly3"); // failing on enlisting next participant
+            // ut.commit();
+            Assert.fail("The " + SOAPFaultException.class.getName() + " is expected for RollbackOnly test");
+        } catch (SOAPFaultException sfe) {
+            assertOrder("rollbackonly1", client, ROLLBACK, VOLATILE_ROLLBACK);
+            assertOrder("rollbackonly2", client, ROLLBACK, VOLATILE_ROLLBACK);
+            assertOrder("rollbackonly3", client);
+        }
     }
-    
+
     @Test
-    public void testWSATVoteReadOnlyDurable() throws Exception {
+    public void testWSATVoteReadOnly() throws Exception {
         ut.begin();
-        client.invoke(VOTE_READONLY_DURABLE); // volatile is bound to COMMIT
+        client.invoke("readonly1", VOTE_READONLY_VOLATILE); // volatile for VOLATILE_COMMIT
+        client.invoke("readonly2", VOTE_READONLY_DURABLE); // durable for COMMIT
+        client.invoke("readonly3", VOTE_READONLY_DURABLE, VOTE_READONLY_VOLATILE);
         ut.commit();
     
-        assertOrder(client, BEFORE_PREPARE, PREPARE, VOLATILE_COMMIT);
-    }
-    
-    @Test
-    public void testWSATVoteReadOnlyBothParticipants() throws Exception {
-        ut.begin();
-        client.invoke(VOTE_READONLY_DURABLE, VOTE_READONLY_VOLATILE);
-        ut.commit();
-    
-        assertOrder(client, BEFORE_PREPARE, PREPARE);
+        assertOrder("readonly1", client, BEFORE_PREPARE, PREPARE, COMMIT);
+        assertOrder("readonly2", client, BEFORE_PREPARE, PREPARE, VOLATILE_COMMIT);
+        assertOrder("readonly3", client, BEFORE_PREPARE, PREPARE);
     }
 
     @Test
     public void testWSATApplicationException() throws Exception {
         try {
             ut.begin();
-            client.invoke(APPLICATION_EXCEPTION);
+            client.invoke("applicationexception1");
+            client.invoke("applicationexception2");
+            client.invoke("applicationexception3", APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (TestApplicationException e) {
             //Exception expected
         } finally {
             ut.rollback();
         }
-        //TODO: should this cause Rollback? - probinson
-        assertOrder(client, ROLLBACK, VOLATILE_ROLLBACK);
+
+        assertOrder("applicationexception1", client, ROLLBACK, VOLATILE_ROLLBACK);
+        assertOrder("applicationexception2", client, ROLLBACK, VOLATILE_ROLLBACK);
+        assertOrder("applicationexception3", client, ROLLBACK, VOLATILE_ROLLBACK);
     }
 }
