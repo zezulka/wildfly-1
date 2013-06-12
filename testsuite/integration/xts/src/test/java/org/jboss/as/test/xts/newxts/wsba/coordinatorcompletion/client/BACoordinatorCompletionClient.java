@@ -22,17 +22,12 @@
 
 package org.jboss.as.test.xts.newxts.wsba.coordinatorcompletion.client;
 
-import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
 
 import org.jboss.as.test.xts.newxts.wsba.coordinatorcompletion.service.BACoordinatorCompletion;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class BACoordinatorCompletionClient
 {
@@ -42,7 +37,6 @@ public class BACoordinatorCompletionClient
     
     private static final String TARGET_NAMESPACE = "http://www.jboss.com/jbossas/test/xts/ba/coordinatorcompletion/";
     
-    @SuppressWarnings("rawtypes")
     public static BACoordinatorCompletion newInstance() throws Exception
     {
         URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + BACoordinatorCompletionTestCase.ARCHIVE_NAME + "/BACoordinatorCompletion?wsdl");
@@ -51,12 +45,8 @@ public class BACoordinatorCompletionClient
 
         Service service = Service.create(wsdlLocation, serviceName);
         
-        // Chain client handler
         BACoordinatorCompletion client = service.getPort(portName, BACoordinatorCompletion.class);
-        BindingProvider bindingProvider = (BindingProvider) client;
-        List<Handler> handlers = new ArrayList<Handler>(1);
-        handlers.add(new JaxWSHeaderContextProcessor());
-        bindingProvider.getBinding().setHandlerChain(handlers);
+
         return client;
     }
 }

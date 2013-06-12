@@ -23,18 +23,12 @@
 package org.jboss.as.test.xts.newxts.wsat.client;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
 
 import org.apache.log4j.Logger;
 import org.jboss.as.test.xts.newxts.wsat.service.AT;
-
-import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
 
 public class ATClient {
     private static final Logger log = Logger.getLogger(ATClient.class);
@@ -51,7 +45,6 @@ public class ATClient {
         return ATClient.newInstance(serviceNamespaceName, serviceNamespaceName);
     }
     
-    @SuppressWarnings("rawtypes")
     public static AT newInstance(String serviceUrl, String serviceNamespaceName) throws Exception {
         
         URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + ATTestCase.ARCHIVE_NAME + "/" + serviceUrl + "?wsdl");
@@ -61,12 +54,8 @@ public class ATClient {
 
         Service service = Service.create(wsdlLocation, serviceName);
        
-        // Chain WS Context processor
         AT atService = service.getPort(portName, AT.class);
-        BindingProvider bindingProvider = (BindingProvider) atService;
-        List<Handler> handlers = new ArrayList<Handler>(1);
-        handlers.add(new JaxWSHeaderContextProcessor());
-        bindingProvider.getBinding().setHandlerChain(handlers);
+
         return atService;
     }
 }
