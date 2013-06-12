@@ -165,7 +165,6 @@ public class ATTestCase extends BaseFunctionalTest {
             client3.invoke();
             ut.commit();
         } catch (TransactionRolledBackException e) {
-            // TODO: all different from spreadsheet
             assertEventLogClient1(BEFORE_PREPARE, ROLLBACK, VOLATILE_ROLLBACK);
             assertEventLogClient2(BEFORE_PREPARE, ROLLBACK);
             assertEventLogClient3(ROLLBACK, VOLATILE_ROLLBACK);
