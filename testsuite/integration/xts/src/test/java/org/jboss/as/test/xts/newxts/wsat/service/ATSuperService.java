@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2013, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -19,7 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.jboss.as.test.xts.newxts.wsat.service;
+
+import javax.inject.Inject;
 
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
 import org.jboss.as.test.xts.newxts.util.EventLog;
@@ -35,23 +38,22 @@ import com.arjuna.mw.wst11.UserTransactionFactory;
 import com.arjuna.wst.UnknownTransactionException;
 import com.arjuna.wst.WrongStateException;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.servlet.annotation.WebServlet;
+/**
+ * Service implemenation - this implemetation is inherited by annotated web services.
+ */
+public abstract class ATSuperService {
+    private static final Logger log = Logger.getLogger(ATSuperService.class);
 
-
-@WebService(serviceName = "ATService", portName = "AT", name = "AT", targetNamespace = "http://www.jboss.com/jbossas/test/xts/wsat/at/")
-@SOAPBinding(style = SOAPBinding.Style.RPC)
-@HandlerChain(file = "/context-handlers.xml")
-@WebServlet(name="ATService", urlPatterns={"/ATService"})
-public class ATService {
-    private static final Logger log = Logger.getLogger(ATService.class);
-    private final EventLog eventLog = new EventLog();
-    
+    @Inject
+    private EventLog eventLog;
+   
     /**
      * Adding 2 participants - Volatile and Durable
+     * 
+     * @param callName  call name works for differentiate several calls to the same webservice
+     *                  if you don't want care pass null (or overloaded method :) 
+     * @param serviceCommands  service commands that service will react on
+     * 
      * @throws WrongStateException 
      * @throws com.arjuna.wst.SystemException 
      * @throws UnknownTransactionException 
@@ -59,10 +61,9 @@ public class ATService {
      * @throws javax.transaction.SystemException 
      * @throws IllegalStateException 
      */
-    @WebMethod
-    public void invoke(String callName, ServiceCommand[] serviceCommands) throws TestApplicationException {
+    public void invokeWithCallName(String callName, ServiceCommand[] serviceCommands) throws TestApplicationException {
         
-        log.infof("[AT SERVICE] web method invoke(%s)", callName);
+        log.infof("[AT SERVICE] web method invoke(%s) with eventLog %s", callName, eventLog);
         eventLog.foundEventLogName(callName);
         UserTransaction userTransaction;
         
@@ -73,12 +74,12 @@ public class ATService {
             
             // Enlist the Durable Participant for this service
             TransactionManager transactionManager = TransactionManagerFactory.transactionManager();
-            ATDurableParticipant durableParticipant = new ATDurableParticipant(callName, serviceCommands, eventLog, transactionId);
+            ATDurableParticipant durableParticipant = new ATDurableParticipant(serviceCommands, callName, eventLog, transactionId);
             log.info("[SERVICE] Enlisting a Durable2PC participant into the AT");
             transactionManager.enlistForDurableTwoPhase(durableParticipant, "ATServiceDurable:" + new Uid().toString());
             
             // Enlist the Volatile Participant for this service
-            ATVolatileParticipant volatileParticipant = new ATVolatileParticipant(callName, serviceCommands, eventLog, transactionId);
+            ATVolatileParticipant volatileParticipant = new ATVolatileParticipant(serviceCommands, callName, eventLog, transactionId);
             log.info("[SERVICE] Enlisting a VolatilePC participant into the AT");
             transactionManager.enlistForVolatileTwoPhase(volatileParticipant, "ATServiceVolatile:" + new Uid().toString());
         } catch (Exception e) {
@@ -100,15 +101,5 @@ public class ATService {
 
         // There will be some business logic here normally
         log.info("|AT SERVICE] I'm working on nothing...");
-    }
-
-    @WebMethod
-    public EventLog getEventLog() {
-        return eventLog;
-    }
-
-    @WebMethod
-    public void clearEventLog() {
-        eventLog.clear();
     }
 }

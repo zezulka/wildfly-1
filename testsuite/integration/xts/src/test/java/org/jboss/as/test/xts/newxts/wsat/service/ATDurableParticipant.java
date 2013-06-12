@@ -44,9 +44,9 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     
     // Is participant already enlisted to transaction?
     private static Map<String, List<ATDurableParticipant>> activeParticipants = new HashMap<String, List<ATDurableParticipant>>();
-    String transactionId;
+    private String transactionId;
 
-    private String participantName;
+    private String eventLogName;
     // Service command which define behaving of the participant
     private ServiceCommand[] serviceCommands;
     // Where to log participant activity
@@ -55,11 +55,16 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
 
     /**
      * Creates a new participant for this transaction. Participants and transaction instances have a one-to-one mapping.
+     * 
+     * @param serviceCommands  service commands for interrupting of the processing
+     * @param eventLogName name for event log - differentiate calls on the same web service/creating participant
+     * @param eventLog  event log that info about processing will be put into
+     * @param transactionId transaction id works for logging active participants
      */
-    public ATDurableParticipant(String participantName, ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
+    public ATDurableParticipant(ServiceCommand[] serviceCommands, String eventLogName, EventLog eventLog, String transactionId) {
         this.serviceCommands = serviceCommands;
         this.eventLog = eventLog;
-        this.participantName = participantName;
+        this.eventLogName = eventLogName;
         
         addParticipant(transactionId);
     }
@@ -75,8 +80,8 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     @Override
     // TODO: added option for System Exception would be thrown?
     public Vote prepare() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.PREPARE);
-        log.info("[AT SERVICE] Durable participant prepare() - logged: " + EventLogEvent.PREPARE);
+        eventLog.addEvent(eventLogName, EventLogEvent.PREPARE);
+        log.infof("[AT SERVICE] Durable participant prepare() - logged: %s", EventLogEvent.PREPARE);
 
         if(ServiceCommand.isPresent(ServiceCommand.VOTE_ROLLBACK, serviceCommands)) {
             log.info("[AT SERVICE] Durable participant prepare(): " + Aborted.class.getSimpleName());
@@ -99,7 +104,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override
     public void commit() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.COMMIT);
+        eventLog.addEvent(eventLogName, EventLogEvent.COMMIT);
         log.info("[AT SERVICE] Durable participant commit() - logged: " + EventLogEvent.COMMIT);
         activeParticipants.remove(transactionId);
     }
@@ -113,7 +118,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override
     public void rollback() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.ROLLBACK);
+        eventLog.addEvent(eventLogName, EventLogEvent.ROLLBACK);
         log.info("[AT SERVICE] Durable participant rollback() - logged: " + EventLogEvent.ROLLBACK);
         activeParticipants.remove(transactionId);
     }
@@ -121,7 +126,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
     @SuppressWarnings("deprecation")
     @Override
     public void unknown() throws SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.UNKNOWN);
+        eventLog.addEvent(eventLogName, EventLogEvent.UNKNOWN);
         log.info("[AT SERVICE] Durable participant unknown() - logged: " + EventLogEvent.UNKNOWN);
     }
 
@@ -130,7 +135,7 @@ public class ATDurableParticipant implements  Durable2PCParticipant, Serializabl
      */
     @Override    
     public void error() throws SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.ERROR);
+        eventLog.addEvent(eventLogName, EventLogEvent.ERROR);
         log.info("[AT SERVICE] Durable participant error() - logged: " + EventLogEvent.ERROR);
     }
     

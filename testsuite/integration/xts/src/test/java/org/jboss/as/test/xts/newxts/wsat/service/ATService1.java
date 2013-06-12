@@ -19,20 +19,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.jboss.as.test.xts.newxts.wsat.service;
-
-import javax.jws.WebMethod;
 
 import org.jboss.as.test.xts.newxts.base.TestApplicationException;
 import org.jboss.as.test.xts.newxts.util.ServiceCommand;
 
-/**
- *  WS-AT simple web service interface
- */
-public interface AT {
+import javax.jws.HandlerChain;
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.servlet.annotation.WebServlet;
 
+
+@WebService(serviceName = "ATService1", portName = "AT", name = "AT", targetNamespace = "http://www.jboss.com/jbossas/test/xts/wsat/at/")
+@SOAPBinding(style = SOAPBinding.Style.RPC)
+@HandlerChain(file = "/context-handlers.xml")
+@WebServlet(name="ATService1", urlPatterns={"/ATService1"})
+public class ATService1 extends ATSuperService {
+    public static final String LOG_NAME = "service1";
+       
     @WebMethod
-    public void invoke(ServiceCommand... serviceCommands) throws TestApplicationException;
-    
+    public void invoke(ServiceCommand[] serviceCommands) throws TestApplicationException {
+        super.invokeWithCallName(LOG_NAME, serviceCommands);
+    }
 }

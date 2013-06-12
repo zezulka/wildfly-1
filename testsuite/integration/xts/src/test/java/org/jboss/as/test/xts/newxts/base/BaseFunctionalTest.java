@@ -25,6 +25,10 @@ package org.jboss.as.test.xts.newxts.base;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.test.xts.newxts.util.EventLogEvent;
 import org.junit.Assert;
 
@@ -34,6 +38,9 @@ import com.arjuna.mw.wst11.UserBusinessActivity;
  * Shared functionality with XTS test cases. 
  */
 public class BaseFunctionalTest {
+    
+    @ArquillianResource
+    private InitialContext iniCtx;
     
     // ---- Work with transactions
     public void rollbackIfActive(com.arjuna.mw.wst11.UserTransaction ut) {
@@ -60,8 +67,21 @@ public class BaseFunctionalTest {
         }
     }
     
+    protected <T> T lookup(Class<T> beanType, String archiveName) {
+        try {
+            return beanType.cast(iniCtx.lookup("java:global/" + archiveName + "/" + beanType.getSimpleName() + "!"
+                + beanType.getName()));
+        } catch(NamingException ne) {
+            throw new RuntimeException(ne);
+        }
+    }
+    
     
     // ---- Test result checking
+    protected void assertOrder(BaseServiceInterface client, EventLogEvent... expectedOrder) {
+        Assert.assertEquals(Arrays.asList(expectedOrder), client.getEventLog().getEventLog());
+    }
+    
     protected void assertOrder(String eventLogName, BaseServiceInterface client, EventLogEvent... expectedOrder) {
         Assert.assertEquals(Arrays.asList(expectedOrder), client.getEventLog().getEventLog(eventLogName));
     }

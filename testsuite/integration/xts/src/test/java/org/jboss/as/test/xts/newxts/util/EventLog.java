@@ -28,12 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("serial")
-public class EventLog implements Serializable {
+import javax.ejb.Singleton;
 
+@Singleton
+public class EventLog implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     // Event logs for a name
-    private static volatile Map<String, List<EventLogEvent>> dataUnavailableLog = new HashMap<String, List<EventLogEvent>>();
-    private static volatile Map<String, List<EventLogEvent>> eventLog = new HashMap<String, List<EventLogEvent>>();
+    private volatile Map<String, List<EventLogEvent>> dataUnavailableLog = new HashMap<String, List<EventLogEvent>>();
+    private volatile Map<String, List<EventLogEvent>> eventLog = new HashMap<String, List<EventLogEvent>>();
     
     private static final String UNKNOWN_EVENTLOG_NAME = "unknown";
 
@@ -49,15 +52,16 @@ public class EventLog implements Serializable {
     }
     
     public void addEvent(EventLogEvent event) {
-        addEvent(UNKNOWN_EVENTLOG_NAME, event);
+        addEvent(null, event);
     }
        
     public void addEvent(String eventLogName, EventLogEvent event) {
+        System.out.println("Adding event " + event + " to logger " + this);
         getListToModify(eventLogName, eventLog).add(event);
     }
 
     public void addDataUnavailable(EventLogEvent event) {
-        addDataUnavailable(UNKNOWN_EVENTLOG_NAME, event);
+        addDataUnavailable(null, event);
     }
     
     public void addDataUnavailable(String eventLogName, EventLogEvent event) {
@@ -65,18 +69,20 @@ public class EventLog implements Serializable {
     }
 
     public List<EventLogEvent> getEventLog() {
-        return getEventLog(UNKNOWN_EVENTLOG_NAME);
+        return getEventLog(null);
     }
     
     public List<EventLogEvent> getEventLog(String eventLogName) {
+        eventLogName = eventLogName == null ? UNKNOWN_EVENTLOG_NAME : eventLogName;
         return eventLog.get(eventLogName);
     }
     
     public List<EventLogEvent> getDataUnavailableLog() {
-        return getDataUnavailableLog(UNKNOWN_EVENTLOG_NAME);
+        return getDataUnavailableLog(null);
     }
     
     public List<EventLogEvent> getDataUnavailableLog(String eventLogName) {
+        eventLogName = eventLogName == null ? UNKNOWN_EVENTLOG_NAME : eventLogName;
         return dataUnavailableLog.get(eventLogName);
     }
 
@@ -96,6 +102,8 @@ public class EventLog implements Serializable {
     
     // --- helper method
     private <T> List<T> getListToModify(String eventLogName, Map<String, List<T>> map) {
+        eventLogName = eventLogName == null ? UNKNOWN_EVENTLOG_NAME : eventLogName;
+        
         if(map.containsKey(eventLogName)) {
             return map.get(eventLogName);
         } else {

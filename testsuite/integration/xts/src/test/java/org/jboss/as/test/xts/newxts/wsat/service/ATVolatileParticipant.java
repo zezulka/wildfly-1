@@ -46,7 +46,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
     private static Map<String, List<ATVolatileParticipant>> activeParticipants = new HashMap<String, List<ATVolatileParticipant>>();
     String transactionId;
 
-    private String participantName;
+    private String eventLogName;
     // Service command which define behaving of the participant
     private ServiceCommand[] serviceCommands;
     // Where to log participant activity
@@ -54,11 +54,16 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
 
     /**
      * Creates a new participant for this transaction. Participants and transaction instances have a one-to-one mapping.
+     * 
+     * @param serviceCommands  service commands for interrupting of the processing
+     * @param eventLogName name for event log - differentiate calls on the same web service/creating participant
+     * @param eventLog  event log that info about processing will be put into
+     * @param transactionId transaction id works for logging active participants
      */
-    public ATVolatileParticipant(String participantName, ServiceCommand[] serviceCommands, EventLog eventLog, String transactionId) {
+    public ATVolatileParticipant(ServiceCommand[] serviceCommands, String eventLogName, EventLog eventLog, String transactionId) {
         this.serviceCommands = serviceCommands;
         this.eventLog = eventLog;
-        this.participantName = participantName;
+        this.eventLogName = eventLogName;
         
         addParticipant(transactionId);
     }
@@ -74,7 +79,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
     @Override
     // TODO: added option for System Exception would be thrown?
     public Vote prepare() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.BEFORE_PREPARE);
+        eventLog.addEvent(eventLogName, EventLogEvent.BEFORE_PREPARE);
         log.info("[AT SERVICE] Volatile participant prepare() - logged: " + EventLogEvent.BEFORE_PREPARE);
 
         if(ServiceCommand.isPresent(ServiceCommand.VOTE_ROLLBACK_PRE_PREPARE, serviceCommands)) {
@@ -98,7 +103,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override
     public void commit() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.VOLATILE_COMMIT);
+        eventLog.addEvent(eventLogName, EventLogEvent.VOLATILE_COMMIT);
         log.info("[AT SERVICE] Volatile participant commit() - logged: " + EventLogEvent.VOLATILE_COMMIT);
     }
 
@@ -111,14 +116,14 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override
     public void rollback() throws WrongStateException, SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.VOLATILE_ROLLBACK);
+        eventLog.addEvent(eventLogName, EventLogEvent.VOLATILE_ROLLBACK);
         log.info("[AT SERVICE] Volatile participant rollback() - logged: " + EventLogEvent.VOLATILE_ROLLBACK);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void unknown() throws SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.UNKNOWN);
+        eventLog.addEvent(eventLogName, EventLogEvent.UNKNOWN);
         log.info("[AT SERVICE] Volatile participant unknown() - logged: " + EventLogEvent.UNKNOWN);
     }
 
@@ -127,7 +132,7 @@ public class ATVolatileParticipant implements Volatile2PCParticipant, Serializab
      */
     @Override    
     public void error() throws SystemException {
-        eventLog.addEvent(participantName, EventLogEvent.ERROR);
+        eventLog.addEvent(eventLogName, EventLogEvent.ERROR);
         log.info("[AT SERVICE] Volatile participant error() - logged: " + EventLogEvent.ERROR);
     }
     
