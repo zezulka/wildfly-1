@@ -36,11 +36,29 @@ import org.jboss.logging.Logger;
 public class TestXAResource implements XAResource {
     private static Logger log = Logger.getLogger(TestXAResource.class);
 
-    private TransactionCheckerSingleton checker;
+    private TransactionCheckerSingletonRemote checker;
     private int transactionTimeout;
     private int prepareReturnValue = XAResource.XA_OK;
 
+<<<<<<< HEAD
     public TestXAResource(TransactionCheckerSingleton checker) {
+=======
+    private Action actionToDo = Action.NOTHING;
+    private volatile boolean isWaiting = true;
+
+    /**
+     * Action type that defines special action that TestXAResource can do.
+     */
+    public enum Action {
+        NOTHING,
+        RMERR_PREPARE, RMFAIL_PREPARE,
+        RMERR_COMMIT, RMFAIL_COMMIT,
+        RMERR_ROLLBACK, RMFAIL_ROLLBACK,
+        WAIT_AT_COMMIT, WAIT_AT_ROLLBACK;
+    }
+
+    public TestXAResource(TransactionCheckerSingletonRemote checker, Action testXAResourceAction) {
+>>>>>>> 3375c83... [WFLY-6212] in progress to try to fix the ejb lookup functionality
         this.checker = checker;
     }
 

@@ -43,8 +43,21 @@ public final class TxTestUtil {
         // no instance here
     }
 
+<<<<<<< HEAD
     public static void enlistTestXAResource(Transaction txn) {
         TestXAResource xaResource = new TestXAResource(getChecker());
+=======
+    public static TestXAResource enlistTestXAResource(Transaction txn) {
+        return enlistTestXAResource(txn, TestXAResource.Action.NOTHING, getChecker());
+    }
+
+    public static TestXAResource enlistTestXAResource(Transaction txn, TestXAResource.Action testXAResourceAction) {
+        return enlistTestXAResource(txn, testXAResourceAction, getChecker());
+    }
+
+    public static TestXAResource enlistTestXAResource(Transaction txn, TestXAResource.Action testXAResourceAction, TransactionCheckerSingletonRemote checker) {
+        TestXAResource xaResource = new TestXAResource(checker, testXAResourceAction);
+>>>>>>> 3375c83... [WFLY-6212] in progress to try to fix the ejb lookup functionality
         try {
             txn.enlistResource(xaResource);
         } catch (IllegalStateException | RollbackException | SystemException e) {
@@ -110,7 +123,7 @@ public final class TxTestUtil {
         }
     }
 
-    private static TransactionCheckerSingleton getChecker() {
+    private static TransactionCheckerSingletonRemote getChecker() {
         return CDI.current().select(TransactionCheckerSingleton.class).get();
     }
 }
