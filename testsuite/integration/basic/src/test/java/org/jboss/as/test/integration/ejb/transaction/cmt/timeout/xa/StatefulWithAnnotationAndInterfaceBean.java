@@ -56,7 +56,7 @@ public class StatefulWithAnnotationAndInterfaceBean implements SessionSynchroniz
     private SessionContext context;
 
     @Inject
-    private SingletonChecker checker;
+    private TransactionCheckerSingleton checker;
 
     public void afterBegin() throws EJBException, RemoteException {
         log.info("afterBegin called");

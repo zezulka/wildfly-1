@@ -25,10 +25,9 @@ package org.jboss.as.test.integration.ejb.transaction.cmt.timeout.xa;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.as.test.integration.ejb.transaction.utils.SingletonChecker;
-import org.jboss.as.test.integration.ejb.transaction.utils.SingletonCheckerRemote;
-import org.jboss.as.test.integration.ejb.transaction.utils.TestLookupUtil;
-import org.jboss.as.test.integration.ejb.transaction.utils.TxTestUtil;
+import org.jboss.as.test.integration.transactions.TransactionTestLookupUtil;
+import org.jboss.as.test.integration.transactions.TransactionCheckerSingleton;
+import org.jboss.as.test.integration.transactions.TxTestUtil;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -56,6 +55,7 @@ public class StatefulTimeoutTestCase {
 
     private TransactionCheckerSingleton checker;
 
+
     @Deployment
     public static Archive<?> createDeployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "stateful-txn-timeout.jar")
@@ -67,7 +67,7 @@ public class StatefulTimeoutTestCase {
 
     @Before
     public void startUp() throws NamingException {
-        this.checker = TestLookupUtil.lookupModule(initCtx, SingletonChecker.class);
+        this.checker = TransactionTestLookupUtil.lookupModule(initCtx, TransactionCheckerSingleton.class);
         checker.resetAll();
     }
 
@@ -90,7 +90,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void noTimeoutWithAnnotation() throws Exception {
-        StatefulWithAnnotationBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
+        StatefulWithAnnotationBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
         bean.testTransaction();
         bean.testTransaction();
 
@@ -103,7 +103,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void noTimeoutWithAnnotationAndInterface() throws Exception {
-        StatefulWithAnnotationAndInterfaceBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationAndInterfaceBean.class);
+        StatefulWithAnnotationAndInterfaceBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationAndInterfaceBean.class);
         bean.testTransaction();
         bean.testTransaction();
 
@@ -116,7 +116,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void noTimeoutWithRegistry() throws Exception {
-        StatefulWithRegistryBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
+        StatefulWithRegistryBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
         bean.testTransaction();
         bean.testTransaction();
 
@@ -134,7 +134,7 @@ public class StatefulTimeoutTestCase {
     // --------------------------------------------------------
     @Test
     public void timeout() throws Exception {
-        StatefulBean bean = TestLookupUtil.lookupModule(initCtx, StatefulBean.class);
+        StatefulBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulBean.class);
         try {
             bean.testTransactionTimeout();
             Assert.fail("Excpected rollback exception being thrown");
@@ -157,7 +157,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void timeoutJtaSynchro() throws Exception {
-        StatefulBean bean = TestLookupUtil.lookupModule(initCtx, StatefulBean.class);
+        StatefulBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulBean.class);
         try {
             bean.testTransactionTimeoutWithSynchronization();
             Assert.fail("Excpected rollback exception being thrown");
@@ -184,7 +184,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void rollbackOnly() throws Exception {
-        StatefulBean bean = TestLookupUtil.lookupModule(initCtx, StatefulBean.class);
+        StatefulBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulBean.class);
         try {
             bean.testTransactionRollbackOnly();
             Assert.fail("Excpected rollback exception being thrown");
@@ -212,7 +212,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void timeoutWithAnnotation() throws Exception {
-        StatefulWithAnnotationBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
+        StatefulWithAnnotationBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
         try {
             bean.testTransactionTimeout();
             Assert.fail("Excpected rollback exception being thrown");
@@ -238,7 +238,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void timeoutWithAnnotationAddingJtaSynchro() throws Exception {
-        StatefulWithAnnotationBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
+        StatefulWithAnnotationBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
         try {
             bean.testTransactionTimeoutSynchroAdded();
             Assert.fail("Excpected rollback exception being thrown");
@@ -264,7 +264,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void rollbackOnlyWithAnnotation() throws Exception {
-        StatefulWithAnnotationBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
+        StatefulWithAnnotationBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithAnnotationBean.class);
         try {
             bean.testTransactionRollbackOnly();
             Assert.fail("Excpected rollback exception being thrown");
@@ -292,7 +292,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void timeoutWithRegistry() throws Exception {
-        StatefulWithRegistryBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
+        StatefulWithRegistryBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
         try {
             bean.testTransactionTimeout();
             Assert.fail("Excpected rollback exception being thrown");
@@ -318,7 +318,7 @@ public class StatefulTimeoutTestCase {
 
     @Test
     public void timeoutWithRegistryAddingJtaSynchro() throws Exception {
-        StatefulWithRegistryBean bean = TestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
+        StatefulWithRegistryBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatefulWithRegistryBean.class);
         try {
             bean.testTransactionWithSynchronizationTimeout();
             Assert.fail("Excpected rollback exception being thrown");
