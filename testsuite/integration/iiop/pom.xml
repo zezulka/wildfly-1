@@ -112,7 +112,9 @@
                                 <configuration>
                                     <!-- Tests to execute. -->
                                     <includes>
-                                        <include>org/jboss/as/test/iiop/**/*TestCase.java</include>
+                                        <!--<include>org/jboss/as/test/iiop/client/IIOPTransactionPropagationTestCase.java</include>-->
+                                        <!--<include>org/jboss/as/test/iiop/transaction/TransactionIIOPInvocationTestCase.java</include>-->
+                                        <include>org/jboss/as/test/iiop/transaction/timeout/IIOPTimeoutTestCase.java</include>
                                     </includes>
 
                                     <!-- Parameters to test cases. -->
@@ -129,31 +131,6 @@
                                         -Dcom.arjuna.ats.arjuna.common.propertiesFile=jbossts-properties.xml</argLine>
                                 </configuration>
                             </execution>
-
-                            <!-- SSL transport tests -->
-                            <execution>
-                                <id>tests-iiop-ssl.surefire</id>
-                                <phase>test</phase>
-                                <goals><goal>test</goal></goals>
-                                <configuration>-->
-                                    <!-- Tests to execute. -->
-                                    <includes>
-                                        <include>org/jboss/as/test/iiopssl/**/*TestCase.java</include>
-                                    </includes>
-
-                                    <!-- Parameters to test cases. -->
-                                    <systemPropertyVariables combine.children="append">
-                                        <arquillian.launch>iiop-ssl</arquillian.launch>
-                                        <jboss.server.config.file.name>standalone-full.xml</jboss.server.config.file.name>
-                                        <org.jboss.ejb.client.wildfly-testsuite-hack>true</org.jboss.ejb.client.wildfly-testsuite-hack>
-                                    </systemPropertyVariables>
-                                    <argLine>
-                                        -Djava.endorsed.dirs=${project.build.directory}/endorsed
-                                        -Dcom.sun.CORBA.ORBUseDynamicStub=true
-                                        -Dcom.arjuna.ats.arjuna.common.propertiesFile=jbossts-properties.xml</argLine>
-                                </configuration>
-                            </execution>
-
                         </executions>
                     </plugin>
 

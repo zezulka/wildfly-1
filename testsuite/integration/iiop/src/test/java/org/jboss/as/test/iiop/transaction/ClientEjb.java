@@ -31,7 +31,6 @@ public class ClientEjb {
     private IIOPTransactionalStatefulHome statefulHome;
 
     public void basicTransactionPropagationTest() throws RemoteException, SystemException, NotSupportedException {
-
         final IIOPTransactionalRemote remote = home.create();
         Assert.assertEquals(Status.STATUS_NO_TRANSACTION, remote.transactionStatus());
         userTransaction.begin();
@@ -41,6 +40,18 @@ public class ClientEjb {
             userTransaction.rollback();
         }
 
+    }
+    
+    public void basicTransactionPropagationStatefulTest() throws RemoteException, SystemException, NotSupportedException {
+        final IIOPTransactionalStatefulRemote remote = statefulHome.create();
+        Assert.assertEquals(Status.STATUS_NO_TRANSACTION, remote.transactionStatus());
+        userTransaction.begin();
+        try {
+            Assert.assertEquals(Status.STATUS_ACTIVE, remote.transactionStatus());
+        } finally {
+            userTransaction.rollback();
+        }
+        
     }
 
     public void testSameTransactionEachCall() throws RemoteException, SystemException, NotSupportedException {

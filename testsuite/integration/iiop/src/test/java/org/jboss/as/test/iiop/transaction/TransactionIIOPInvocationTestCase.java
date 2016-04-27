@@ -86,7 +86,7 @@ public class TransactionIIOPInvocationTestCase {
         return jar;
     }
 
-    @Test
+    // @Test
     @OperateOnDeployment("client")
     public void testRemoteIIOPInvocation() throws IOException, NamingException, NotSupportedException, SystemException {
         final InitialContext context = new InitialContext();
@@ -94,24 +94,35 @@ public class TransactionIIOPInvocationTestCase {
         ejb.basicTransactionPropagationTest();
 
     }
+    
+    // @Test
+    @OperateOnDeployment("client")
+    public void testRemoteIIOPInvocationStateful() throws IOException, NamingException, NotSupportedException, SystemException {
+        final InitialContext context = new InitialContext();
+        final ClientEjb ejb = (ClientEjb) context.lookup("java:module/" + ClientEjb.class.getSimpleName());
+        ejb.basicTransactionPropagationStatefulTest();
+        
+    }
 
     @Test
     @OperateOnDeployment("client")
     public void testRollbackOnly() throws IOException, NamingException, NotSupportedException, SystemException {
+        System.out.println("testRollbackOnly");
         final InitialContext context = new InitialContext();
         final ClientEjb ejb = (ClientEjb) context.lookup("java:module/" + ClientEjb.class.getSimpleName());
         ejb.testRollbackOnly();
     }
 
-    @Test
+    // @Test
     @OperateOnDeployment("client")
     public void testRollbackOnlyBeforeCompletion() throws IOException, NamingException, NotSupportedException, SystemException, HeuristicMixedException, HeuristicRollbackException {
+        System.out.println("testRollbackOnlyBeforeCompletion");
         final InitialContext context = new InitialContext();
         final ClientEjb ejb = (ClientEjb) context.lookup("java:module/" + ClientEjb.class.getSimpleName());
         ejb.testRollbackOnlyBeforeCompletion();
     }
 
-    @Test
+    // @Test
     @OperateOnDeployment("client")
     public void testSameTransactionEachCall() throws IOException, NamingException, NotSupportedException, SystemException {
         final InitialContext context = new InitialContext();
@@ -120,7 +131,7 @@ public class TransactionIIOPInvocationTestCase {
     }
 
 
-    @Test
+    // @Test
     @OperateOnDeployment("client")
     public void testSynchronizationSucceeded() throws IOException, NamingException, NotSupportedException, SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
         final InitialContext context = new InitialContext();
@@ -129,7 +140,7 @@ public class TransactionIIOPInvocationTestCase {
     }
 
 
-    @Test
+    // @Test
     @OperateOnDeployment("client")
     public void testSynchronizationFailed() throws IOException, NamingException, NotSupportedException, SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
         final InitialContext context = new InitialContext();
