@@ -67,11 +67,11 @@ public class ExceptionTestCase {
     }
 
     protected SFSB1Interface getBean() throws NamingException {
-        return (SFSB1Interface) lookup(SFSB1.class);
+        return lookup(SFSB1.class);
     }
 
     protected DestroyMarkerBeanInterface getMarker() throws NamingException {
-        return (DestroyMarkerBeanInterface) lookup(DestroyMarkerBean.class);
+        return lookup(DestroyMarkerBean.class);
     }
 
     @Before

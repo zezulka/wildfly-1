@@ -57,10 +57,10 @@ public class ExceptionEjbClientTestCase extends ExceptionTestCase {
     }
 
     protected SFSB1Interface getBean() throws NamingException {
-        return (SFSB1Interface) lookup(SFSB1.class, SFSB1Interface.class, true);
+        return lookup(SFSB1.class, SFSB1Interface.class, true);
     }
 
     protected DestroyMarkerBeanInterface getMarker() throws NamingException {
-        return (DestroyMarkerBeanInterface) lookup(DestroyMarkerBean.class, DestroyMarkerBeanInterface.class, false);
+        return lookup(DestroyMarkerBean.class, DestroyMarkerBeanInterface.class, false);
     }
 }

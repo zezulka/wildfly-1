@@ -61,10 +61,13 @@ public class StatelessBmtRestartTimeoutBean {
                 // expected transaction as there is no txn to rollback - it was aborted by TM
                 log.debugf(rollbacke, "Got expected transaction: %s'", rollbacke.getClass());
             }
+        } finally {
+            // reseting transaction timeout to default one
+            tm.setTransactionTimeout(0);
         }
 
-        // reseting transaction timeout to default one
-        tm.setTransactionTimeout(0);
+        // after reset additional check if default value is used
+        // value depends on settings under txn subsystem but default is 5 minutes
         tm.begin();
         txnAsString = tm.getTransaction().toString();
         TxTestUtil.waitForTimeout(tm);

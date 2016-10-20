@@ -52,7 +52,7 @@ public class StatelessBmtBean {
         TxTestUtil.checkTransactionExists(tm, false);
 
         for(int i = 1; i <= transactionCount; i++) {
-            boolean isTimeout = (timeoutCount - i >= 0) ? true : false;
+            boolean isTimeout = (i <= timeoutCount);
             runTransaction(isTimeout);
         }
 
