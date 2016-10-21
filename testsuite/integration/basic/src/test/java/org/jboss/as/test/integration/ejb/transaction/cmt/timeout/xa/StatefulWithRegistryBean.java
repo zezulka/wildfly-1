@@ -77,6 +77,6 @@ public class StatefulWithRegistryBean {
     }
 
     public void touch() {
-        log.info("Bean touched");
+        log.trace("Bean touched");
     }
 }

@@ -41,7 +41,7 @@ public class TestSynchronization implements Synchronization {
 
     @Override
     public void beforeCompletion() {
-        log.infof("beforeCompletion called");
+        log.tracef("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
@@ -50,7 +50,7 @@ public class TestSynchronization implements Synchronization {
      */
     @Override
     public void afterCompletion(int status) {
-        log.infof("afterCompletion called with status '%s'", status);
+        log.tracef("afterCompletion called with status '%s'", status);
         boolean isCommitted = status == javax.transaction.Status.STATUS_COMMITTED ? true : false;
         checker.setSynchronizedAfter(isCommitted);
     }

@@ -53,19 +53,19 @@ public class StatelessWithAnnotationBean {
 
     @AfterBegin
     public void afterBegin() {
-        log.info("afterBegin called");
+        log.trace("afterBegin called");
         checker.setSynchronizedBegin();
     }
 
     @BeforeCompletion
     public void beforeCompletion() {
-        log.info("beforeCompletion called");
+        log.trace("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
     @AfterCompletion
     public void afterCompletion(boolean isCommitted) {
-        log.infof("afterCompletion: transaction was%s committed", isCommitted ? "" : " not");
+        log.tracef("afterCompletion: transaction was%s committed", isCommitted ? "" : " not");
         checker.setSynchronizedAfter(isCommitted);
     }
 

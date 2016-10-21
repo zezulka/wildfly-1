@@ -61,7 +61,7 @@ public class AnnotationTimeoutMDB implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
-            log.infof("onMessage received message: %s '%s'", message, ((TextMessage) message).getText());
+            log.tracef("onMessage received message: %s '%s'", message, ((TextMessage) message).getText());
 
             final Destination replyTo = message.getJMSReplyTo();
 

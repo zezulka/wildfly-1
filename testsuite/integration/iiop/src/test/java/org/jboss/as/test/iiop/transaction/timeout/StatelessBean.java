@@ -51,22 +51,22 @@ public class StatelessBean {
     private TransactionCheckerSingleton checker;
 
     public void afterBegin() throws EJBException, RemoteException {
-        log.info("afterBegin called");
+        log.trace("afterBegin called");
         checker.setSynchronizedBegin();
     }
 
     public void beforeCompletion() throws EJBException, RemoteException {
-        log.info("beforeCompletion called");
+        log.trace("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
     public void afterCompletion(boolean committed) throws EJBException, RemoteException {
-        log.infof("afterCompletion: transaction was%s committed", committed ? "" : " not");
+        log.tracef("afterCompletion: transaction was%s committed", committed ? "" : " not");
         checker.setSynchronizedAfter(committed);
     }
 
     public void testTransaction() throws RemoteException, SystemException {
-        log.info("Method stateless #testTransaction called");
+        log.trace("Method stateless #testTransaction called");
         Transaction txn;
         txn = tm.getTransaction();
 
@@ -76,7 +76,7 @@ public class StatelessBean {
 
     @TransactionTimeout(value = 1)
     public void testTimeout() throws SystemException, RemoteException {
-        log.info("Method stateless #testTimeout called");
+        log.trace("Method stateless #testTimeout called");
         Transaction txn;
         txn = tm.getTransaction();
 
@@ -92,6 +92,6 @@ public class StatelessBean {
     }
 
     public void touch() {
-        log.debug("Stateless bean instance has been touched");
+        log.trace("Stateless bean instance has been touched");
     }
 }

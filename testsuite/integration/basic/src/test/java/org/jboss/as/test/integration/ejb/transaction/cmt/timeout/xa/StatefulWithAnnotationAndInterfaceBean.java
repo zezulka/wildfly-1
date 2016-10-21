@@ -59,35 +59,35 @@ public class StatefulWithAnnotationAndInterfaceBean implements SessionSynchroniz
     private TransactionCheckerSingleton checker;
 
     public void afterBegin() throws EJBException, RemoteException {
-        log.info("afterBegin called");
+        log.trace("afterBegin called");
         checker.setSynchronizedBegin();
     }
 
     public void beforeCompletion() throws EJBException, RemoteException {
-        log.info("beforeCompletion called");
+        log.trace("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
     public void afterCompletion(boolean committed) throws EJBException, RemoteException {
-        log.infof("afterCompletion: transaction was%s committed", committed ? "" : " not");
+        log.tracef("afterCompletion: transaction was%s committed", committed ? "" : " not");
         checker.setSynchronizedAfter(committed);
     }
 
     @AfterBegin
     public void afterB() {
-        log.info("afterBegin called");
+        log.trace("afterBegin called");
         checker.setSynchronizedBegin();
     }
 
     @BeforeCompletion
     public void beforeC() {
-        log.info("beforeCompletion called");
+        log.trace("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
     @AfterCompletion
     public void afterC(boolean isCommitted) {
-        log.infof("afterCompletion: transaction was%s committed", isCommitted ? "" : " not");
+        log.tracef("afterCompletion: transaction was%s committed", isCommitted ? "" : " not");
         checker.setSynchronizedAfter(isCommitted);
     }
 

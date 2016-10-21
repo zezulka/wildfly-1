@@ -82,6 +82,6 @@ public class StatefulBean {
     }
 
     public void touch() {
-        log.info("Bean touched");
+        log.trace("Bean touched");
     }
 }

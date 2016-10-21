@@ -46,60 +46,60 @@ public class TestXAResource implements XAResource {
 
     @Override
     public void commit(Xid xid, boolean onePhase) throws XAException {
-        log.infof("commit xid:[%s], %s one phase", xid, onePhase ? "with" : "without");
+        log.tracef("commit xid:[%s], %s one phase", xid, onePhase ? "with" : "without");
         checker.addCommit();
     }
 
     @Override
     public void end(Xid xid, int flags) throws XAException {
-        log.infof("end xid:[%s], flag: %s", xid, flags);
+        log.tracef("end xid:[%s], flag: %s", xid, flags);
     }
 
     @Override
     public void forget(Xid xid) throws XAException {
-        log.infof("forget xid:[%s]", xid);
+        log.tracef("forget xid:[%s]", xid);
     }
 
     @Override
     public int getTransactionTimeout() throws XAException {
-        log.infof("getTransactionTimeout: returning timeout: %s", transactionTimeout);
+        log.tracef("getTransactionTimeout: returning timeout: %s", transactionTimeout);
         return transactionTimeout;
     }
 
     @Override
     public boolean isSameRM(XAResource xares) throws XAException {
-        log.infof("isSameRM returning false to xares: %s", xares);
+        log.tracef("isSameRM returning false to xares: %s", xares);
         return false;
     }
 
     @Override
     public int prepare(Xid xid) throws XAException {
-        log.infof("prepare xid: [%s]", xid);
+        log.tracef("prepare xid: [%s]", xid);
         return prepareReturnValue;
     }
 
     @Override
     public Xid[] recover(int flag) throws XAException {
-        log.infof("recover with flags: %s", flag);
+        log.tracef("recover with flags: %s", flag);
         return new Xid[]{};
     }
 
     @Override
     public void rollback(Xid xid) throws XAException {
-        log.infof("rollback xid: [%s]", xid);
+        log.tracef("rollback xid: [%s]", xid);
         checker.addRollback();
     }
 
     @Override
     public boolean setTransactionTimeout(int seconds) throws XAException {
-        log.infof("setTransactionTimeout: setting timeout: %s", seconds);
+        log.tracef("setTransactionTimeout: setting timeout: %s", seconds);
         this.transactionTimeout = seconds;
         return true;
     }
 
     @Override
     public void start(Xid xid, int flags) throws XAException {
-        log.infof("start xid: [%s], flags: %s", xid, flags);
+        log.tracef("start xid: [%s], flags: %s", xid, flags);
     }
 
 }

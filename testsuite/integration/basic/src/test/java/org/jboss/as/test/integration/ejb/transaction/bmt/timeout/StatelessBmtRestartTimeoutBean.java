@@ -53,7 +53,7 @@ public class StatelessBmtRestartTimeoutBean {
             tm.commit();
         } catch (RollbackException e) {
             try {
-                log.debugf("Rollbacking transaction '%s'", txnAsString);
+                log.tracef("Rollbacking transaction '%s'", txnAsString);
                 tm.rollback();
                 Assert.fail("Rollback should throw IllegalStateException: BaseTransaction.rollback - ARJUNA016074: no transaction!"
                     + " as the original transaction should be aborted by transaction manager");

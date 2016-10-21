@@ -52,17 +52,17 @@ public class StatefulBean implements SessionSynchronization {
     private TransactionCheckerSingleton checker;
 
     public void afterBegin() throws EJBException, RemoteException {
-        log.info("afterBegin called");
+        log.trace("afterBegin called");
         checker.setSynchronizedBegin();
     }
 
     public void beforeCompletion() throws EJBException, RemoteException {
-        log.info("beforeCompletion called");
+        log.trace("beforeCompletion called");
         checker.setSynchronizedBefore();
     }
 
     public void afterCompletion(boolean committed) throws EJBException, RemoteException {
-        log.infof("afterCompletion: transaction was%s committed", committed ? "" : " not");
+        log.tracef("afterCompletion: transaction was%s committed", committed ? "" : " not");
         checker.setSynchronizedAfter(committed);
     }
 
@@ -71,7 +71,7 @@ public class StatefulBean implements SessionSynchronization {
     }
 
     public void testTransaction() throws RemoteException, SystemException {
-        log.info("Method stateful #testTransaction called");
+        log.trace("Method stateful #testTransaction called");
         Transaction txn;
         txn = tm.getTransaction();
 
@@ -81,7 +81,7 @@ public class StatefulBean implements SessionSynchronization {
 
     @TransactionTimeout(value = 1)
     public void testTimeout() throws SystemException, RemoteException {
-        log.info("Method stateful #testTimeout called");
+        log.trace("Method stateful #testTimeout called");
         Transaction txn;
         txn = tm.getTransaction();
 
@@ -97,6 +97,6 @@ public class StatefulBean implements SessionSynchronization {
     }
 
     public void touch() {
-        log.debug("Stateful bean instance has been touched");
+        log.trace("Stateful bean instance has been touched");
     }
 }

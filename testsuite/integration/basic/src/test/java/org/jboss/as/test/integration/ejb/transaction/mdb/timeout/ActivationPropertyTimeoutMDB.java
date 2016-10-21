@@ -57,11 +57,11 @@ public class ActivationPropertyTimeoutMDB implements MessageListener {
     @Override
     public void onMessage(Message message) {
         try {
-            log.infof("onMessage received message: %s '%s'", message, ((TextMessage) message).getText());
+            log.tracef("onMessage received message: %s '%s'", message, ((TextMessage) message).getText());
 
             // this should mean that second attempt for calling onMessage comes to play
             if(checker.getRolledback() > 0) {
-                log.infof("Discarding message '%s' as onMessage called for second time", message);
+                log.tracef("Discarding message '%s' as onMessage called for second time", message);
                 return;
             }
 

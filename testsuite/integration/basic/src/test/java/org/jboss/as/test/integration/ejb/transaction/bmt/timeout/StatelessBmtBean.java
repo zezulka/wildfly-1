@@ -83,7 +83,7 @@ public class StatelessBmtBean {
                 TxTestUtil.waitForTimeout(tm);
             }
 
-            log.debugf("Commiting transaction '%s'", txnToString);
+            log.tracef("Commiting transaction '%s'", txnToString);
             txn.commit();
 
             if(isTimeout) {
@@ -91,14 +91,14 @@ public class StatelessBmtBean {
                     + TxTestUtil.getStatusAsString(txn.getStatus()) + "'");
             }
         } catch (RollbackException e) {
-            log.infof("Rollbacking transaction '%s'.", txnToString);
+            log.tracef("Rollbacking transaction '%s'.", txnToString);
             try {
                 txn.rollback();
             } catch (Exception rollbacke) {
                 log.debugf(rollbacke, "Expected transaction as can't rollback non active - TM aborted transaction");
             }
             if(isTimeout) {
-                log.infof("Transaction '%s' was timeouted as expected", txnToString);
+                log.tracef("Transaction '%s' was timeouted as expected", txnToString);
             } else {
                 throw new RuntimeException("Transaction should not be rollbacked as wasn't timeouted", e);
             }
