@@ -66,12 +66,18 @@ public class StatelessTimeoutTestCase {
         checker.resetAll();
     }
 
+    /**
+     * Calling a method of BTM where transaction timeout is not modified.
+     * Call is expected to be processed.
+     */
     @Test
     public void noTimeout() throws Exception {
         StatelessBmtBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatelessBmtBean.class);
         bean.testTransaction(1, 0);
     }
 
+    /**
+     */
     @Test
     public void timeout() throws Exception {
         StatelessBmtBean bean = TransactionTestLookupUtil.lookupModule(initCtx, StatelessBmtBean.class);

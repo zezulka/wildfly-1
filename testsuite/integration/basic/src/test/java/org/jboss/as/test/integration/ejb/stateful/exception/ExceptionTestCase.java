@@ -105,7 +105,7 @@ public class ExceptionTestCase {
 
     /**
      * Throwing EJBException which as child of RuntimeException causes
-     * the stateful bean being removed.
+     * SFSB to be removed.
      */
     @Test
     public void testEjbExceptionDestroysBean() throws Exception {
@@ -129,8 +129,8 @@ public class ExceptionTestCase {
     }
 
     /**
-     * Throwing non RuntimeException which does not cause stateful bean
-     * being removed.
+     * Throwing non {@link RuntimeException} which does not cause
+     * SFSB being removed.
      */
     @Test
     public void testUserExceptionDoesNothing() throws Exception {
