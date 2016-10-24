@@ -26,7 +26,6 @@ import java.rmi.RemoteException;
 
 import javax.naming.NamingException;
 import javax.transaction.TransactionRolledbackException;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
@@ -43,7 +42,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -141,7 +139,6 @@ public class IIOPTimeoutTestCase {
     }
 
     @Test
-    @Ignore("WFLY-6935")
     public void timeoutStateful() throws Exception {
         TestBeanRemote bean = lookupStateful();
 
