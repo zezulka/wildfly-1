@@ -144,6 +144,14 @@ class XidTransactionPrepareTask extends XidTransactionManagementTask {
                     if (initCause != null) {
                         xaException.initCause(initCause);
                     }
+
+                    if(subordinateTransaction instanceof com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.TransactionImple) {
+                        for(Throwable derefferred: ((com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.TransactionImple) subordinateTransaction)
+                                .getDeferredThrowables()) {
+                            xaException.addSuppressed(derefferred);
+                        }
+                    }
+
                     throw xaException;
 
                 case TwoPhaseOutcome.INVALID_TRANSACTION:
