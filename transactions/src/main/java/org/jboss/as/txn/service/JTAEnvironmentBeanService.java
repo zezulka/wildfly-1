@@ -33,7 +33,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.tm.LastResource;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -67,6 +66,7 @@ public class JTAEnvironmentBeanService implements Service<JTAEnvironmentBean> {
         jtaEnvironmentBean.setXAResourceRecordWrappingPlugin(new com.arjuna.ats.internal.jbossatx.jta.XAResourceRecordWrappingPluginImpl());
         jtaEnvironmentBean.setTransactionManagerJNDIContext("java:jboss/TransactionManager");
         jtaEnvironmentBean.setTransactionSynchronizationRegistryJNDIContext("java:jboss/TransactionSynchronizationRegistry");
+        jtaEnvironmentBean.setSubordinateTransactionImporterClassName(org.jboss.as.txn.service.WildflySuordinateTransactionImporter.class.getName());
     }
 
     @Override
