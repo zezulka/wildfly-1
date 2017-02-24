@@ -26,7 +26,6 @@ import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.jboss.tm.JBossXATerminator;
 
 /**
  * The XATerminator service for wildfly transaction client XATerminator.
@@ -34,11 +33,11 @@ import org.jboss.tm.JBossXATerminator;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @author <a href="mailto:ochaloup@redhat.com">Ondrej Chaloupka</a>
  */
-public final class ContextXATerminatorService implements Service<JBossXATerminator> {
+public final class ContextXATerminatorService implements Service<ContextXATerminator> {
 
-    private final ContextXATerminatorService value;
+    private final ContextXATerminator value;
 
-    public ContextXATerminatorService(final ContextXATerminatorService value) {
+    public ContextXATerminatorService(final ContextXATerminator value) {
         this.value = value;
     }
 
@@ -48,7 +47,7 @@ public final class ContextXATerminatorService implements Service<JBossXATerminat
     public void stop(final StopContext context) {
     }
 
-    public ContextXATerminatorService getValue() throws IllegalStateException {
+    public ContextXATerminator getValue() throws IllegalStateException {
         return TxnServices.notNull(value);
     }
 }

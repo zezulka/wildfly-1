@@ -80,7 +80,7 @@ import org.jboss.as.txn.service.UserTransactionAccessControlService;
 import org.jboss.as.txn.service.UserTransactionBindingService;
 import org.jboss.as.txn.service.UserTransactionRegistryService;
 import org.jboss.as.txn.service.UserTransactionService;
-import org.jboss.as.txn.service.XATerminatorService;
+import org.jboss.as.txn.service.JBossXATerminatorService;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.inject.InjectionException;
 import org.jboss.msc.inject.Injector;
@@ -452,18 +452,18 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // add dependency on JTA environment bean
         recoveryManagerServiceServiceBuilder.addDependencies(deps);
 
-        final XATerminatorService xaTerminatorService;
+        final JBossXATerminatorService xaTerminatorService;
         final ExtendedJBossXATerminatorService extendedJBossXATerminatorService;
 
         if (jts) {
             recoveryManagerServiceServiceBuilder.addDependency(ServiceName.JBOSS.append("iiop-openjdk", "orb-service"), ORB.class, recoveryManagerService.getOrbInjector());
 
             com.arjuna.ats.internal.jbossatx.jts.jca.XATerminator terminator = new com.arjuna.ats.internal.jbossatx.jts.jca.XATerminator();
-            xaTerminatorService = new XATerminatorService(terminator);
+            xaTerminatorService = new JBossXATerminatorService(terminator);
             extendedJBossXATerminatorService = new ExtendedJBossXATerminatorService(terminator);
         } else {
             com.arjuna.ats.internal.jbossatx.jta.jca.XATerminator terminator = new com.arjuna.ats.internal.jbossatx.jta.jca.XATerminator();
-            xaTerminatorService = new XATerminatorService(terminator);
+            xaTerminatorService = new JBossXATerminatorService(terminator);
             extendedJBossXATerminatorService = new ExtendedJBossXATerminatorService(terminator);
         }
 

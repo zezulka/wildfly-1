@@ -54,7 +54,7 @@ public final class BootStrapContextService implements Service<CloneableBootstrap
 
     private final InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService> txManager = new InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService>();
 
-    private final InjectedValue<JBossXATerminator> xaTerminator = new InjectedValue<JBossXATerminator>();
+    private final InjectedValue<ContextXATerminator> xaTerminator = new InjectedValue<ContextXATerminator>();
 
     private final InjectedValue<JcaSubsystemConfiguration> jcaConfig = new InjectedValue<JcaSubsystemConfiguration>();
 

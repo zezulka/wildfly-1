@@ -29,16 +29,16 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.tm.JBossXATerminator;
 
 /**
- * The XATerminator service.
+ * The XATerminator service for Narayana XATerminator.
  *
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
-public final class XATerminatorService implements Service<JBossXATerminator> {
+public final class JBossXATerminatorService implements Service<JBossXATerminator> {
 
     private final JBossXATerminator value;
 
-    public XATerminatorService(final JBossXATerminator value) {
+    public JBossXATerminatorService(final JBossXATerminator value) {
         this.value = value;
     }
 
