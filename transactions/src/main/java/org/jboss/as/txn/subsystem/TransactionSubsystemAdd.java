@@ -31,6 +31,7 @@ import static org.jboss.as.txn.subsystem.CommonAttributes.USE_JDBC_STORE;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.resource.spi.XATerminator;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
@@ -67,6 +68,7 @@ import org.jboss.as.txn.logging.TransactionLogger;
 import org.jboss.as.txn.service.ArjunaObjectStoreEnvironmentService;
 import org.jboss.as.txn.service.ArjunaRecoveryManagerService;
 import org.jboss.as.txn.service.ArjunaTransactionManagerService;
+import org.jboss.as.txn.service.ContextXATerminatorService;
 import org.jboss.as.txn.service.CoreEnvironmentService;
 import org.jboss.as.txn.service.ExtendedJBossXATerminatorService;
 import org.jboss.as.txn.service.JTAEnvironmentBeanService;
@@ -454,6 +456,7 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final JBossXATerminatorService xaTerminatorService;
         final ExtendedJBossXATerminatorService extendedJBossXATerminatorService;
+        final ContextXATerminatorService contextXATerminatorService = new ContextXATerminatorService(LocalTransactionContext.getCurrent().getXATerminator());
 
         if (jts) {
             recoveryManagerServiceServiceBuilder.addDependency(ServiceName.JBOSS.append("iiop-openjdk", "orb-service"), ORB.class, recoveryManagerService.getOrbInjector());
@@ -472,6 +475,10 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
         context.getServiceTarget()
                 .addService(TxnServices.JBOSS_TXN_EXTENDED_JBOSS_XA_TERMINATOR, extendedJBossXATerminatorService)
                 .setInitialMode(Mode.ACTIVE).install();
+        context.getServiceTarget()
+                .addService(TxnServices.JBOSS_TXN_CONTEXT_XA_TERMINATOR, contextXATerminatorService)
+                .setInitialMode(Mode.ACTIVE).install();
+
 
         recoveryManagerServiceServiceBuilder
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(recoveryBindingName), SocketBinding.class, recoveryManagerService.getRecoveryBindingInjector())

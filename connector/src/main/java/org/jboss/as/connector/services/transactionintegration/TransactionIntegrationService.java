@@ -24,6 +24,7 @@ package org.jboss.as.connector.services.transactionintegration;
 
 import static org.jboss.as.connector.logging.ConnectorLogger.ROOT_LOGGER;
 
+import javax.resource.spi.XATerminator;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 
@@ -36,7 +37,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.jboss.tm.JBossXATerminator;
 import org.jboss.tm.XAResourceRecoveryRegistry;
 import org.jboss.tm.usertx.UserTransactionRegistry;
 
@@ -54,7 +54,7 @@ public final class TransactionIntegrationService implements Service<TransactionI
 
     private final InjectedValue<UserTransactionRegistry> utr = new InjectedValue<UserTransactionRegistry>();
 
-    private final InjectedValue<JBossXATerminator> terminator = new InjectedValue<JBossXATerminator>();
+    private final InjectedValue<XATerminator> terminator = new InjectedValue<XATerminator>();
 
     private final InjectedValue<XAResourceRecoveryRegistry> rr = new InjectedValue<XAResourceRecoveryRegistry>();
 
@@ -92,7 +92,7 @@ public final class TransactionIntegrationService implements Service<TransactionI
         return utr;
     }
 
-    public Injector<JBossXATerminator> getTerminatorInjector() {
+    public Injector<XATerminator> getTerminatorInjector() {
         return terminator;
     }
 

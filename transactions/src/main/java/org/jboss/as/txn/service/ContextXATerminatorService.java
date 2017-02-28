@@ -22,6 +22,8 @@
 
 package org.jboss.as.txn.service;
 
+import javax.resource.spi.XATerminator;
+
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -33,11 +35,11 @@ import org.jboss.msc.service.StopContext;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @author <a href="mailto:ochaloup@redhat.com">Ondrej Chaloupka</a>
  */
-public final class ContextXATerminatorService implements Service<ContextXATerminator> {
+public final class ContextXATerminatorService implements Service<XATerminator> {
 
-    private final ContextXATerminator value;
+    private final XATerminator value;
 
-    public ContextXATerminatorService(final ContextXATerminator value) {
+    public ContextXATerminatorService(final XATerminator value) {
         this.value = value;
     }
 
@@ -47,7 +49,7 @@ public final class ContextXATerminatorService implements Service<ContextXATermin
     public void stop(final StopContext context) {
     }
 
-    public ContextXATerminator getValue() throws IllegalStateException {
+    public XATerminator getValue() throws IllegalStateException {
         return TxnServices.notNull(value);
     }
 }

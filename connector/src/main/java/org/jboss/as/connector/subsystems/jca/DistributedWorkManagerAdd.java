@@ -28,6 +28,8 @@ import static org.jboss.as.connector.subsystems.jca.Constants.WORKMANAGER_SHORT_
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.resource.spi.XATerminator;
+
 import org.jboss.as.connector.services.workmanager.DistributedWorkManagerService;
 import org.jboss.as.connector.services.workmanager.NamedDistributedWorkManager;
 import org.jboss.as.connector.services.workmanager.statistics.DistributedWorkManagerStatisticsService;
@@ -153,7 +155,7 @@ public class DistributedWorkManagerAdd extends AbstractAddStepHandler {
         builder.addDependency(ServiceBuilder.DependencyType.OPTIONAL, ThreadsServices.EXECUTOR.append(WORKMANAGER_LONG_RUNNING).append(name), Executor.class, wmService.getExecutorLongInjector());
         builder.addDependency(ThreadsServices.EXECUTOR.append(WORKMANAGER_SHORT_RUNNING).append(name), Executor.class, wmService.getExecutorShortInjector());
 
-        builder.addDependency(TxnServices.JBOSS_TXN_XA_TERMINATOR, JBossXATerminator.class, wmService.getXaTerminatorInjector())
+        builder.addDependency(TxnServices.JBOSS_TXN_CONTEXT_XA_TERMINATOR, XATerminator.class, wmService.getXaTerminatorInjector())
                 .setInitialMode(ServiceController.Mode.ACTIVE)
                 .install();
         WorkManagerStatisticsService wmStatsService = new WorkManagerStatisticsService(context.getResourceRegistrationForUpdate(), name, true);

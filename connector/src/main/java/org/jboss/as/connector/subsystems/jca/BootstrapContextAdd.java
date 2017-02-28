@@ -23,6 +23,8 @@ package org.jboss.as.connector.subsystems.jca;
 
 import static org.jboss.as.connector.subsystems.jca.Constants.DEFAULT_NAME;
 
+import javax.resource.spi.XATerminator;
+
 import org.jboss.as.connector.services.bootstrap.BootStrapContextService;
 import org.jboss.as.connector.services.bootstrap.NamedBootstrapContext;
 import org.jboss.as.connector.util.ConnectorServices;
@@ -73,7 +75,7 @@ public class BootstrapContextAdd extends AbstractAddStepHandler {
                 serviceTarget
                         .addService(ConnectorServices.BOOTSTRAP_CONTEXT_SERVICE.append(name), bootCtxService)
                         .addDependency(ServiceBuilder.DependencyType.REQUIRED, ConnectorServices.WORKMANAGER_SERVICE.append(workmanager), WorkManager.class, bootCtxService.getWorkManagerValueInjector())
-                        .addDependency(TxnServices.JBOSS_TXN_XA_TERMINATOR, JBossXATerminator.class, bootCtxService.getXaTerminatorInjector())
+                        .addDependency(TxnServices.JBOSS_TXN_CONTEXT_XA_TERMINATOR, XATerminator.class, bootCtxService.getXaTerminatorInjector())
                         .addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER, com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, bootCtxService.getTxManagerInjector())
                         .addDependency(ConnectorServices.CONNECTOR_CONFIG_SERVICE, JcaSubsystemConfiguration.class, bootCtxService.getJcaConfigInjector())
                         .setInitialMode(ServiceController.Mode.ACTIVE)
