@@ -94,6 +94,7 @@ public class XTSHandlerDeploymentProcessor implements DeploymentUnitProcessor {
 
             if (endpointMetaData.isBridgeEnabled()) {
                 handlers.add(TX_BRIDGE_HANDLER);
+                handlers.add(XTSImportGlobalTxnInboundBridgeHandler.class.getName());
             }
             handlers.add(TX_CONTEXT_HANDLER);
 
