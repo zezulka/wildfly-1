@@ -89,7 +89,7 @@ public class DataSourceTestCase extends AbstractCliTestBase {
         testRemoveDataSource();
     }
 
-    @Test
+    // @Test
     public void testXaDataSource() throws Exception {
         testAddXaDataSource();
         testModifyXaDataSource();
