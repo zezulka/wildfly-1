@@ -38,6 +38,8 @@ import javax.xml.stream.XMLStreamException;
 
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathElement;
+import org.jboss.jbossts.xts.recovery.participant.ba.XTSBARecoveryManager;
+import org.jboss.jbossts.xts.recovery.participant.ba.XTSBARecoveryModule;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
@@ -254,5 +256,9 @@ public interface TransactionLogger extends BasicLogger {
     @LogMessage(level = WARN)
     @Message(id = 39, value = "Can't stop recovery manager service %s")
     void cannotStopRecoveryManagerService(com.arjuna.ats.jbossatx.jta.RecoveryManagerService recoveryService, @Cause Exception e);
+
+    @LogMessage(level = WARN)
+    @Message(id = 40, value = "Can't unregister XTSBARecoveryModule '%s' as it's not registered to XTSBARecoveryManager '%s'")
+    void cantUnregisterXTSBARecoveryModule(XTSBARecoveryModule recmodule, XTSBARecoveryManager xtsbarm, @Cause Exception e);
 
 }

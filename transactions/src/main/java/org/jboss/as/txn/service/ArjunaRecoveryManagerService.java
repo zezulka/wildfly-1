@@ -25,6 +25,7 @@ package org.jboss.as.txn.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.internal.jta.recovery.jts.JCAServerTransactionRecoveryModule;
@@ -213,8 +214,12 @@ public class ArjunaRecoveryManagerService implements Service<RecoveryManagerServ
     }
 
     private void stopCompensationsRecovery() {
-        XTSBARecoveryManager.getRecoveryManager().unregisterRecoveryModule(remoteParticipantRecoveryModule);
-        RecoveryManager.manager().removeModule(localParticipantRecoveryModule, true);
+        try {
+            XTSBARecoveryManager.getRecoveryManager().unregisterRecoveryModule(remoteParticipantRecoveryModule);
+        } catch (NoSuchElementException nsee) {
+            TransactionLogger.ROOT_LOGGER.cantUnregisterXTSBARecoveryModule(remoteParticipantRecoveryModule, XTSBARecoveryManager.getRecoveryManager(), nsee);
+        }
+            RecoveryManager.manager().removeModule(localParticipantRecoveryModule, true);
         xtsRecoveryInitialisation.shutdown();
     }
 }
