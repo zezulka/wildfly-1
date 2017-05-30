@@ -174,7 +174,7 @@ public class ArjunaRecoveryManagerService implements Service<RecoveryManagerServ
         try {
             recoveryManagerService.stop();
         } catch (Exception e) {
-            // todo log
+            TransactionLogger.ROOT_LOGGER.cannotStopRecoveryManagerService(recoveryManagerService, e);
         }
         recoveryManagerService.destroy();
         recoveryManagerService = null;
