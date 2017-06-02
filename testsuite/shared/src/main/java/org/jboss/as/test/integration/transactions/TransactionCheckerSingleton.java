@@ -24,8 +24,6 @@ package org.jboss.as.test.integration.transactions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.annotation.ManagedBean;
 import javax.ejb.LocalBean;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
@@ -38,7 +36,6 @@ import javax.ejb.Singleton;
 @Singleton
 @LocalBean
 @Remote
-@ManagedBean
 public class TransactionCheckerSingleton implements TransactionCheckerSingletonRemote {
     private int committed, prepared, rolledback;
     private int  synchronizedBegin, synchronizedBefore, synchronizedAfter,
