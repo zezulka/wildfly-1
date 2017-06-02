@@ -29,4 +29,9 @@ public class TransactionSynchronizationRegistryInjectionTestCase {
     public void testTransactionSynchronizationRegistryIsInjected() {
         Assert.assertTrue(cdiBean.isTransactionSynchronizationRegistryInjected());
     }
+
+    @Test
+    public void testTransactionManagerIsInjected() {
+        Assert.assertTrue(cdiBean.isTransactionManagerInjected());
+    }
 }
