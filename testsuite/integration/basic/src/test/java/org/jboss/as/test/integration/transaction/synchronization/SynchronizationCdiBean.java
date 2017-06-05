@@ -7,10 +7,12 @@ import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.Transactional;
 import org.jboss.as.test.integration.transactions.TestSynchronization;
 import org.jboss.as.test.integration.transactions.TransactionCheckerSingleton;
+import org.jboss.logging.Logger;
 
 @Transactional
 @ApplicationScoped
 public class SynchronizationCdiBean {
+    private static final Logger log = Logger.getLogger(SynchronizationCdiBean.class);
 
     @Resource
     TransactionSynchronizationRegistry registry;
@@ -31,7 +33,10 @@ public class SynchronizationCdiBean {
 
     public void rollbackOnly() throws Exception {
         TestSynchronization sync = new TestSynchronization(checker);
+        log.trace(">>>>>>>>>>>>>>>>>>>>>> Before synchronization registered");
         registry.registerInterposedSynchronization(sync);
+        log.trace(">>>>>>>>>>>>>>>>>>>>>> Before rollback only");
         registry.setRollbackOnly();
+        log.trace(">>>>>>>>>>>>>>>>>>>>>> After rollback only");
     }
 }

@@ -24,6 +24,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.test.integration.transactions.TestSynchronization;
 import org.jboss.as.test.integration.transactions.TransactionCheckerSingletonRemote;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -39,6 +40,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class TransactionSynchronizationCdiTest {
+    private static final Logger log = Logger.getLogger(TransactionSynchronizationCdiTest.class);
 
     @EJB
     private TransactionCheckerSingletonRemote checker;
@@ -48,7 +50,9 @@ public class TransactionSynchronizationCdiTest {
 
     @Before
     public void setUp() {
+        log.tracef("calling checker %s to reset counters on @Before", checker);
         checker.resetAll();
+        log.tracef("checker %s call to reset counters returned to test execution", checker);
     }
 
     @Deployment
@@ -84,10 +88,17 @@ public class TransactionSynchronizationCdiTest {
 
     @Test
     public void rollbackOnly() throws Exception {
+        log.tracef("before calling cdi bean ", cdiBean);
         cdiBean.rollbackOnly();
+        log.tracef("after the bean %s was called and returned the excecution back to test", cdiBean);
+
+        log.tracef("calling checker %s to see before synchronized counter for bean %s", checker, cdiBean);
         Assert.assertFalse("CMT was set as roll-only Synchronization.beforeCompletion is not expected to be called",
             checker.isSynchronizedBefore());
+        log.tracef("checker %s called to get before synchronized counter for bean %s", checker, cdiBean);
+        log.tracef("calling checker %s to see after synchronized counter for bean %s", checker, cdiBean);
         Assert.assertTrue("CMT was set as roll-only Synchronization.afterCompletion is expected to be called",
             checker.isSynchronizedAfter());
+        log.tracef("checker %s called to get after synchronized counter for bean %s", checker, cdiBean);
     }
 }

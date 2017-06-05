@@ -20,8 +20,8 @@ public class TransactionSynchronizationRegistryInjectionTestCase {
     @Deployment
     public static WebArchive deployment() {
         WebArchive war = ShrinkWrap.create(WebArchive.class)
-                .addPackage(TransactionSynchronizationRegistryInjectionTestCase.class.getPackage())
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+            .addClasses(CdiBean.class, TransactionSynchronizationRegistryInjectionTestCase.class)
+            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         return war;
     }
 

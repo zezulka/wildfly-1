@@ -8,22 +8,20 @@ import javax.transaction.TransactionSynchronizationRegistry;
 @ApplicationScoped
 public class CdiBean {
 
-    @Resource(lookup = "java:comp/TransactionSynchronizationRegistry")
-    TransactionSynchronizationRegistry transactionSynchronizationRegistry;
-
-    // @Resource(lookup = "java:/TransactionManager")
-    // TransactionManager txnMgr;
+    // @Resource(lookup = "java:comp/TransactionSynchronizationRegistry")
+    // @Resource(lookup = "java:jboss/TransactionSynchronizationRegistry")
+    // @Resource(lookup = "java:/TransactionSynchronizationRegistry")
+    @Resource
+    private TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
     @Resource(lookup = "java:/TransactionManager")
     private TransactionManager transactionManager;
 
     public boolean isTransactionSynchronizationRegistryInjected() {
         return transactionSynchronizationRegistry != null;
-        // return txnMgr != null;
     }
 
     public boolean isTransactionManagerInjected() {
         return transactionManager != null;
     }
-
 }
