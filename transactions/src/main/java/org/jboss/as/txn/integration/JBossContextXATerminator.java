@@ -52,8 +52,18 @@ public class JBossContextXATerminator implements JBossXATerminator {
     }
 
     @Override
+    public int prepare(Xid xid) throws XAException {
+        return contextXATerminator.prepare(xid);
+    }
+
+    @Override
     public void commit(Xid xid, boolean onePhase) throws XAException {
         contextXATerminator.commit(xid, onePhase);
+    }
+
+    @Override
+    public void rollback(Xid xid) throws XAException {
+        contextXATerminator.rollback(xid);
     }
 
     @Override
@@ -61,19 +71,12 @@ public class JBossContextXATerminator implements JBossXATerminator {
         contextXATerminator.forget(xid);
     }
 
-    @Override
-    public int prepare(Xid xid) throws XAException {
-        return contextXATerminator.prepare(xid);
-    }
 
     @Override
     public Xid[] recover(int flag) throws XAException {
-        return contextXATerminator.recover(flag);
-    }
-
-    @Override
-    public void rollback(Xid xid) throws XAException {
-        contextXATerminator.rollback(xid);
+        Xid[] xids = jbossXATerminator.recover(flag);
+        if(xids == null) xids = new Xid[]{};
+        return xids;
     }
 
 
