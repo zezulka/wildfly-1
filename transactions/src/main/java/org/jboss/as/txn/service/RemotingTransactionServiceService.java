@@ -22,6 +22,7 @@
 
 package org.jboss.as.txn.service;
 
+import org.jboss.as.remoting.RemoteOutboundConnectionService;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -30,6 +31,7 @@ import org.jboss.msc.value.InjectedValue;
 import org.jboss.remoting3.Endpoint;
 import org.jboss.remoting3.Registration;
 import org.jboss.remoting3.ServiceRegistrationException;
+import org.jboss.tm.XAResourceRecoveryRegistry;
 import org.wildfly.transaction.client.LocalTransactionContext;
 import org.wildfly.transaction.client.provider.remoting.RemotingTransactionService;
 
@@ -41,6 +43,7 @@ import org.wildfly.transaction.client.provider.remoting.RemotingTransactionServi
 public final class RemotingTransactionServiceService implements Service<RemotingTransactionService> {
     private final InjectedValue<LocalTransactionContext> localTransactionContextInjector = new InjectedValue<>();
     private final InjectedValue<Endpoint> endpointInjector = new InjectedValue<>();
+    private final InjectedValue<XAResourceRecoveryRegistry> xaRecoveryRegistry = new InjectedValue<>();
 
     private volatile RemotingTransactionService value;
     private volatile Registration registration;
@@ -52,6 +55,12 @@ public final class RemotingTransactionServiceService implements Service<Remoting
         final RemotingTransactionService remotingTransactionService = RemotingTransactionService.builder().setEndpoint(endpointInjector.getValue()).setTransactionContext(localTransactionContextInjector.getValue()).build();
         try {
             registration = remotingTransactionService.register();
+            context.getController().getServiceContainer().getServiceNames().stream()
+                .filter(sName -> sName.getCanonicalName().startsWith(RemoteOutboundConnectionService.REMOTE_OUTBOUND_CONNECTION_BASE_SERVICE_NAME.getCanonicalName())) // take only remote services
+                .map(sName -> ((RemoteOutboundConnectionService) context.getController().getServiceContainer().getService(sName).getService()).getDestinationUri()) // get uris
+                .forEach(uri -> remotingTransactionService.addRecoveryUri(uri));
+            System.out.println("Registering xaResourceRecovery " + remotingTransactionService.getXAResourceRecovery() + ", " + remotingTransactionService.getRecoveryUris());
+            xaRecoveryRegistry.getValue().addXAResourceRecovery(remotingTransactionService.getXAResourceRecovery());
         } catch (ServiceRegistrationException e) {
             throw new StartException(e);
         }
@@ -69,6 +78,10 @@ public final class RemotingTransactionServiceService implements Service<Remoting
 
     public InjectedValue<Endpoint> getEndpointInjector() {
         return endpointInjector;
+    }
+
+    public InjectedValue<XAResourceRecoveryRegistry> getXaRecoveryRegistry() {
+        return xaRecoveryRegistry;
     }
 
     public RemotingTransactionService getValue() throws IllegalStateException, IllegalArgumentException {
