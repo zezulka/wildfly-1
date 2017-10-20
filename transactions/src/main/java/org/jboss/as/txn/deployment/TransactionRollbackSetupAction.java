@@ -38,6 +38,7 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.wildfly.transaction.client.LocalTransactionContext;
 
 /**
  * Setup action that makes sure that no transactions leak from EE requests
@@ -129,6 +130,9 @@ public class TransactionRollbackSetupAction implements SetupAction, Service<Tran
             if (tm == null) {
                 return;
             }
+            // reimport the transaction for WFTC being in sync with underlaying TM
+            LocalTransactionContext.getCurrent().importProviderTransaction();
+
             final int status = tm.getStatus();
             final boolean active = isTransactionActive(tm, status);
             if (active) {
