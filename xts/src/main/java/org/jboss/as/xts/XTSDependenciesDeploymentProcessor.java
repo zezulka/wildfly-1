@@ -54,6 +54,7 @@ import java.util.List;
 public class XTSDependenciesDeploymentProcessor implements DeploymentUnitProcessor {
 
     private static final ModuleIdentifier XTS_MODULE = ModuleIdentifier.create("org.jboss.xts");
+    private static final ModuleIdentifier XTS_WFTC_INTEGRATION_MODULE = ModuleIdentifier.create("org.wildfly.transaction.xts");
 
     private static final Class[] COMPENSATABLE_ANNOTATIONS = {
             Compensatable.class,
@@ -117,6 +118,7 @@ public class XTSDependenciesDeploymentProcessor implements DeploymentUnitProcess
         final ModuleLoader moduleLoader = Module.getBootModuleLoader();
         final ModuleSpecification moduleSpec = unit.getAttachment(Attachments.MODULE_SPECIFICATION);
         moduleSpec.addSystemDependency(new ModuleDependency(moduleLoader, XTS_MODULE, false, false, false, false));
+        moduleSpec.addSystemDependency(new ModuleDependency(moduleLoader, XTS_WFTC_INTEGRATION_MODULE, false, false, false, false));
     }
 
 }
