@@ -54,7 +54,7 @@ public class XTSExtension implements Extension {
 
     private static final String RESOURCE_NAME = XTSExtension.class.getPackage().getName() + ".LocalDescriptions";
 
-    private static final ModelVersion CURRENT_MODEL_VERSION = ModelVersion.create(2, 0, 0);
+    private static final ModelVersion CURRENT_MODEL_VERSION = ModelVersion.create(2, 1, 0);
 
     static StandardResourceDescriptionResolver getResourceDescriptionResolver(final String keyPrefix) {
         String prefix = SUBSYSTEM_NAME + (keyPrefix == null ? "" : "." + keyPrefix);
@@ -76,6 +76,7 @@ public class XTSExtension implements Extension {
     public void initializeParsers(ExtensionParsingContext context) {
         context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.XTS_1_0.getUriString(), XTSSubsystemParser::new);
         context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.XTS_2_0.getUriString(), XTSSubsystemParser::new);
+        context.setSubsystemXmlMapping(SUBSYSTEM_NAME, Namespace.XTS_2_1.getUriString(), XTSSubsystemParser::new);
     }
 
     private void registerTransformers1x(SubsystemRegistration subsystem) {
@@ -87,8 +88,10 @@ public class XTSExtension implements Extension {
                 return attributeValue.isDefined() && attributeValue.equals(XTSSubsystemDefinition.HOST_NAME.getDefaultValue());
             }
         }, XTSSubsystemDefinition.HOST_NAME)
-        .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION)
-        .addRejectCheck(RejectAttributeChecker.DEFINED, XTSSubsystemDefinition.HOST_NAME, XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION)
+        .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)),
+                XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION, XTSSubsystemDefinition.ASYNC_REGISTRATION)
+        .addRejectCheck(RejectAttributeChecker.DEFINED,
+                XTSSubsystemDefinition.HOST_NAME, XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION, XTSSubsystemDefinition.ASYNC_REGISTRATION)
         .end();
 
         TransformationDescription.Tools.register(builder.build(), subsystem, ModelVersion.create(1, 1, 0));
