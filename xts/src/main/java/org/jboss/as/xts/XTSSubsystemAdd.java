@@ -48,7 +48,10 @@ import com.arjuna.webservices11.wsba.sei.BusinessAgreementWithCoordinatorComplet
 import com.arjuna.webservices11.wsba.sei.BusinessAgreementWithParticipantCompletionCoordinatorPortTypeImpl;
 import com.arjuna.webservices11.wsba.sei.BusinessAgreementWithParticipantCompletionParticipantPortTypeImpl;
 import com.arjuna.webservices11.wscoor.sei.ActivationPortTypeImpl;
+import com.arjuna.webservices11.wscoor.sei.CoordinationFaultPortTypeImpl;
 import com.arjuna.webservices11.wscoor.sei.RegistrationPortTypeImpl;
+import com.arjuna.webservices11.wscoor.sei.RegistrationResponsePortTypeImpl;
+
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -79,6 +82,8 @@ import org.oasis_open.docs.ws_tx.wsba._2006._06.BusinessAgreementWithCoordinator
 import org.oasis_open.docs.ws_tx.wsba._2006._06.BusinessAgreementWithParticipantCompletionCoordinatorService;
 import org.oasis_open.docs.ws_tx.wsba._2006._06.BusinessAgreementWithParticipantCompletionParticipantService;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.ActivationService;
+import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationFaultService;
+import org.oasis_open.docs.ws_tx.wscoor._2006._06.RegistrationResponseService;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.RegistrationService;
 
 
@@ -139,8 +144,10 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
             new ContextInfo("ws-c11",
                     new EndpointInfo[]{
                             new EndpointInfo(ActivationPortTypeImpl.class.getName(), ActivationService.class.getSimpleName()),
-                            new EndpointInfo(RegistrationPortTypeImpl.class.getName(), RegistrationService.class.getSimpleName())
-                    }),
+                            new EndpointInfo(RegistrationPortTypeImpl.class.getName(), RegistrationService.class.getSimpleName()),
+                            new EndpointInfo(RegistrationResponsePortTypeImpl.class.getName(), RegistrationResponseService.class.getSimpleName()),
+                            new EndpointInfo(CoordinationFaultPortTypeImpl.class.getName(), CoordinationFaultService.class.getSimpleName())
+                     }),
             new ContextInfo("ws-t11-coordinator",
                     new EndpointInfo[]{
                             new EndpointInfo(CoordinatorPortTypeImpl.class.getName(), CoordinatorService.class.getSimpleName()),
