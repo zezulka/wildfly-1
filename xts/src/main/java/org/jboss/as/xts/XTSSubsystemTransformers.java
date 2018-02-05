@@ -52,8 +52,10 @@ public class XTSSubsystemTransformers implements ExtensionTransformerRegistratio
                    return attributeValue.isDefined() && attributeValue.equals(XTSSubsystemDefinition.HOST_NAME.getDefaultValue());
                }
            }, XTSSubsystemDefinition.HOST_NAME)
-           .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)), XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION)
-           .addRejectCheck(RejectAttributeChecker.DEFINED, XTSSubsystemDefinition.HOST_NAME, XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION)
+           .setDiscard(new DiscardAttributeChecker.DiscardAttributeValueChecker(new ModelNode(false)),
+                   XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION, XTSSubsystemDefinition.ASYNC_REGISTRATION)
+           .addRejectCheck(RejectAttributeChecker.DEFINED, XTSSubsystemDefinition.HOST_NAME,
+                   XTSSubsystemDefinition.DEFAULT_CONTEXT_PROPAGATION, XTSSubsystemDefinition.ASYNC_REGISTRATION)
            .end();
 
            TransformationDescription.Tools.register(builder.build(), subsystem, ModelVersion.create(1, 1, 0));
