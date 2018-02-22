@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.wsba.participantcompletion.client;
+package org.jboss.as.test.xts.wsba.aparticipantcompletion.client;
 
 import io.undertow.util.NetworkUtils;
 
@@ -49,7 +49,7 @@ public class BAParticipantCompletionClient {
     }
 
     public static BAParticipantCompletion newInstance(String serviceUrl, String serviceNamespaceName) throws Exception {
-        URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + BAParticipantCompletionTestCase.ARCHIVE_NAME + "/" + serviceUrl + "?wsdl");
+        URL wsdlLocation = new URL("http://" + NODE0_ADDR + ":" + NODE0_PORT + "/" + BAAParticipantCompletionTestCase.ARCHIVE_NAME + "/" + serviceUrl + "?wsdl");
         log.trace("wsdlLocation for service: " + wsdlLocation);
         QName serviceName = new QName(TARGET_NAMESPACE, serviceNamespaceName);
         QName portName = new QName(TARGET_NAMESPACE, DEFAULT_PORT_NAME);

@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 @RunWith(Arquillian.class)
-public class TransactionalTestCase {
+public class TransactionalTestCaase {
 
     private static final String DEPLOYMENT_NAME = "transactional-test";
 

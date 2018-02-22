@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.wsba.participantcompletion.client;
+package org.jboss.as.test.xts.wsba.aparticipantcompletion.client;
 
 import javax.inject.Inject;
 
@@ -58,7 +58,7 @@ import static org.jboss.as.test.xts.util.EventLogEvent.*;
  * XTS business activities - participant completition test case
  */
 @RunWith(Arquillian.class)
-public class BAParticipantCompletionTestCase extends BaseFunctionalTest {
+public class BAAParticipantCompletionTestCase extends BaseFunctionalTest {
     UserBusinessActivity uba;
     BAParticipantCompletion client1, client2, client3;
 

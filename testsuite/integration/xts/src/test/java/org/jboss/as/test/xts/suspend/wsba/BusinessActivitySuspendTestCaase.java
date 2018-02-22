@@ -20,53 +20,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.test.xts.suspend.wsat;
+package org.jboss.as.test.xts.suspend.wsba;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.as.test.shared.TestSuiteEnvironment;
-import org.jboss.as.test.shared.integration.ejb.security.PermissionUtils;
 import org.jboss.as.test.xts.suspend.AbstractTestCase;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.runner.RunWith;
-
-import java.net.SocketPermission;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 @RunWith(Arquillian.class)
-public class AtomicTransactionSuspendTestCase extends AbstractTestCase {
-
-    static final String serverHostPort = TestSuiteEnvironment.getServerAddress() + ":"
-            + TestSuiteEnvironment.getHttpPort();
+public class BusinessActivitySuspendTestCaase extends AbstractTestCase {
 
     @TargetsContainer(EXECUTOR_SERVICE_CONTAINER)
     @Deployment(name = EXECUTOR_SERVICE_ARCHIVE_NAME, testable = false)
     public static WebArchive getExecutorServiceArchive() {
-        return getExecutorServiceArchiveBase().addClasses(AtomicTransactionExecutionService.class,
-                AtomicTransactionRemoteService.class, TransactionParticipant.class)
-                .addAsManifestResource(PermissionUtils.createPermissionsXmlAsset(
-                        new SocketPermission(serverHostPort, "connect, resolve")
-                ), "permissions.xml");
+        return getExecutorServiceArchiveBase().addClasses(BusinessActivityExecutionService.class,
+                BusinessActivityRemoteService.class, BusinessActivityParticipant.class);
     }
 
     @TargetsContainer(REMOTE_SERVICE_CONTAINER)
     @Deployment(name = REMOTE_SERVICE_ARCHIVE_NAME, testable = false)
     public static WebArchive getRemoteServiceArchive() {
-        return getRemoteServiceArchiveBase().addClasses(AtomicTransactionRemoteService.class, TransactionParticipant.class)
-                .addAsManifestResource(PermissionUtils.createPermissionsXmlAsset(
-                        new SocketPermission(serverHostPort, "connect, resolve")
-                ), "permissions.xml");
+        return getRemoteServiceArchiveBase().addClasses(BusinessActivityRemoteService.class, BusinessActivityParticipant.class);
     }
 
     protected void assertParticipantInvocations(List<String> invocations) {
-        assertEquals(Arrays.asList("prepare", "commit"), invocations);
+        assertEquals(Collections.singletonList("close"), invocations);
     }
 
 }

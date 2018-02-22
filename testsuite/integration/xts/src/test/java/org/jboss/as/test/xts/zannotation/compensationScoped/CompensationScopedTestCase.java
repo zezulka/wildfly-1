@@ -19,11 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.xts.annotation.compensationScoped;
+package org.jboss.as.test.xts.zannotation.compensationScoped;
+
+import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.as.test.shared.IntermittentFailure;
 import org.jboss.as.test.xts.util.DeploymentHelper;
 import org.jboss.narayana.compensations.internal.BAController;
 import org.jboss.narayana.compensations.internal.BAControllerFactory;
@@ -32,11 +33,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
@@ -55,11 +53,11 @@ public class CompensationScopedTestCase {
                 .addPackage(CompensationScopedTestCase.class.getPackage());
         return archive;
     }
-
+/*
     @BeforeClass
     public static void failing() {
         IntermittentFailure.thisTestIsFailingIntermittently("WFLY-9871");
-    }
+    }*/
 
     @Before
     public void before() {

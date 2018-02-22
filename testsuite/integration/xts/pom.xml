@@ -137,6 +137,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <runOrder>alphabetical</runOrder>
                             <!-- Tests to execute. -->
                             <includes>
                                 <include>org/jboss/as/test/xts/**/*TestCase.java</include>

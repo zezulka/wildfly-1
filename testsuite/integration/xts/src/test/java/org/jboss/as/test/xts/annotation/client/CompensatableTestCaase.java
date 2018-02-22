@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 @RunWith(Arquillian.class)
-public class CompensatableTestCase {
+public class CompensatableTestCaase {
 
     private static final String DEPLOYMENT_NAME = "compensatable-test";
 
