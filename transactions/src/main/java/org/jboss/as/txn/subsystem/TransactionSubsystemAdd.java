@@ -56,6 +56,7 @@ import org.jboss.as.network.SocketBindingManager;
 import org.jboss.as.remoting.RemotingServices;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
+import org.jboss.as.server.ServerEnvironment;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.server.suspend.SuspendController;
 import org.jboss.as.txn.deployment.TransactionDependenciesProcessor;
@@ -97,6 +98,7 @@ import org.jboss.tm.JBossXATerminator;
 import org.jboss.tm.usertx.UserTransactionRegistry;
 import org.omg.CORBA.ORB;
 import org.wildfly.iiop.openjdk.service.CorbaNamingService;
+import org.wildfly.security.manager.WildFlySecurityManager;
 
 import com.arjuna.ats.internal.arjuna.utils.UuidProcessId;
 import com.arjuna.ats.jbossatx.jta.RecoveryManagerService;
@@ -530,8 +532,9 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
     private void checkIfNodeIdentifierIsDefault(final OperationContext context, final ModelNode model) throws OperationFailedException {
         final String nodeIdentifier = TransactionSubsystemRootResourceDefinition.NODE_IDENTIFIER.resolveModelAttribute(context, model).asString();
         final String defaultNodeIdentifier = TransactionSubsystemRootResourceDefinition.NODE_IDENTIFIER.getDefaultValue().asString();
+        final String serverName = WildFlySecurityManager.getPropertyPrivileged(ServerEnvironment.HOST_NAME, defaultNodeIdentifier);
 
-        if (defaultNodeIdentifier.equals(nodeIdentifier)) {
+        if (defaultNodeIdentifier.equals(nodeIdentifier) || nodeIdentifier.equals(serverName)) {
             TransactionLogger.ROOT_LOGGER.nodeIdentifierIsSetToDefault(CommonAttributes.NODE_IDENTIFIER, context.getCurrentAddress().toCLIStyleString());
         }
     }
