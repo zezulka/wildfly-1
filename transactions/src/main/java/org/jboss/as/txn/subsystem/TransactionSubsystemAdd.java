@@ -449,7 +449,7 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final String nodeIdentifier = TransactionSubsystemRootResourceDefinition.NODE_IDENTIFIER.resolveModelAttribute(context, model).asString();
         // install JTA environment bean service
-        final JTAEnvironmentBeanService jtaEnvironmentBeanService = new JTAEnvironmentBeanService(nodeIdentifier);
+        final JTAEnvironmentBeanService jtaEnvironmentBeanService = new JTAEnvironmentBeanService(nodeIdentifier, jts);
         context.getServiceTarget().addService(TxnServices.JBOSS_TXN_JTA_ENVIRONMENT, jtaEnvironmentBeanService)
                 .setInitialMode(Mode.ACTIVE)
                 .install();
