@@ -62,6 +62,13 @@ public class TransactionInflowResourceAdapter implements ResourceAdapter {
     }
 
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
+        try {
+            Xid[] xidsOnRecover = bootstrapContext.getXATerminator().recover(XAResource.TMSTARTRSCAN | XAResource.TMENDRSCAN);
+            if(xidsOnRecover == null) throw new NullPointerException("recover on XATerminator returns null");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         Xid xid = TransactionInflowXid.getUniqueXid(42);
         TransactionInflowWork work = new TransactionInflowWork(endpointFactory, MSG);
         TransactionContext txnCtx = new TransactionContext();
