@@ -30,9 +30,9 @@
     </resources>
 
     <dependencies>
+        <module name="org.jboss.jta"/>
         <module name="javax.transaction.api"/>
-        <module name="javax.resource.api"/>
-        <module name="org.jboss.jts"/>
+
         <module name="org.jboss.ws.api" services="export"/>
         <module name="org.jboss.ws.jaxws-client" services="export"/>
         <module name="org.jboss.ws.cxf.jbossws-cxf-client" services="export"/>
@@ -49,27 +49,22 @@
         <module name="javax.jws.api"/>
         <!-- this is needed to ensure @Resource annotations on the JaxWS endpoint classes are in the
              classloader scope-->
-        <module name="javax.annotation.api"/>
+        <module name="javax.annotation.api"  export="true" />
+        <module name="javax.interceptor.api"  export="true" />
         <!-- this is needed to ensure the JaxWS endpoint classes canb refer to HttpServletRequest etc -->
         <module name="javax.servlet.api"/>
         <module name="javax.ejb.api" />
-        <module name="org.jboss.jts" />
         <module name="javax.xml.ws.api" />
+        <module name="javax.resource.api"/>
+        <module name="javax.enterprise.api"/>
         <module name="org.jboss.weld.api" />
         <module name="org.jboss.weld.core" />
-        <module name="javax.enterprise.api"/>
-        <module name="javax.transaction.api" />
         <module name="org.jboss.logging" />
-        <module name="org.jboss.narayana.compensations" export="true" />
-        <module name="org.jboss.narayana.txframework" export="true" />
-        <module name="javax.annotation.api"  export="true" />
-        <module name="javax.interceptor.api"  export="true" />
         <module name="org.jboss.weld.spi" />
 
         <!-- TODO WFLY-5966 validate the need for these and remove if not needed.
              Prior to WFLY-5922 they were exported by javax.ejb.api. -->
         <module name="javax.xml.rpc.api"/>
         <module name="javax.rmi.api"/>
-        <module name="org.omg.api"/>
     </dependencies>
 </module>

@@ -72,8 +72,8 @@
             <artifactId>narayana-jts-integration</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.narayana.compensations</groupId>
-            <artifactId>compensations</artifactId>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta-integration</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
