@@ -55,6 +55,7 @@ import com.arjuna.webservices11.wscoor.sei.CoordinationFaultPortTypeImpl;
 import com.arjuna.webservices11.wscoor.sei.RegistrationPortTypeImpl;
 import com.arjuna.webservices11.wscoor.sei.RegistrationResponsePortTypeImpl;
 
+import org.jboss.as.compensations.CompensationsDependenciesDeploymentProcessor;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -63,6 +64,7 @@ import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.txn.service.TxnServices;
+import org.jboss.as.txn.subsystem.TransactionExtension;
 import org.jboss.as.webservices.service.EndpointPublishService;
 import org.jboss.as.webservices.util.WSServices;
 import org.jboss.as.xts.logging.XtsAsLogger;
@@ -236,6 +238,7 @@ class XTSSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(XTSExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_XTS_SOAP_HANDLERS, new XTSHandlerDeploymentProcessor());
                 processorTarget.addDeploymentProcessor(XTSExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_XTS, new XTSDependenciesDeploymentProcessor());
                 processorTarget.addDeploymentProcessor(XTSExtension.SUBSYSTEM_NAME, Phase.POST_MODULE, Phase.POST_MODULE_XTS_PORTABLE_EXTENSIONS, new GracefulShutdownDeploymentProcessor());
+                processorTarget.addDeploymentProcessor(TransactionExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_TRANSACTIONS, new CompensationsDependenciesDeploymentProcessor());
             }
         }, OperationContext.Stage.RUNTIME);
 
