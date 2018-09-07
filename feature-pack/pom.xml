@@ -1090,9 +1090,78 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta-integration</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.narayana.jts</groupId>
             <artifactId>narayana-jts-integration</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>jta</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.arjunacore</groupId>
+            <artifactId>arjuna</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana</groupId>
+            <artifactId>common</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.arjunacore</groupId>
+            <artifactId>arjuna</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.arjunacore</groupId>
+            <artifactId>txoj</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>cdi</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jts</groupId>
+            <artifactId>jts</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jts</groupId>
+            <artifactId>orbportability</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jts</groupId>
+            <artifactId>idlj-idl</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jts</groupId>
+            <artifactId>jtax</artifactId>
+            <version>${version.org.jboss.narayana}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.jboss.narayana</groupId>
