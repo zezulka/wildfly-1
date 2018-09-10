@@ -40,6 +40,8 @@
         <module name="org.jboss.jboss-transaction-spi"/>
         <module name="org.jboss.jts"/>
         <module name="org.jboss.jts.integration"/>
+        <module name="org.jboss.jta"/>
+        <module name="org.jboss.jta.integration"/>
         <module name="org.jboss.logging"/>
         <module name="org.jboss.remoting"/>
         <module name="org.jboss.xnio"/>
