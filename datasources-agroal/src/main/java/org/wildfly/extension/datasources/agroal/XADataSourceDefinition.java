@@ -51,6 +51,7 @@ class XADataSourceDefinition extends AbstractDataSourceDefinition {
     static final SimpleAttributeDefinition RECOVERY = create("recovery", ModelType.BOOLEAN)
             .setAllowExpression(true)
             .setDefaultValue(ModelNode.TRUE)
+            .setRequired(false)
             .setRestartAllServices()
             .build();
 
@@ -59,6 +60,7 @@ class XADataSourceDefinition extends AbstractDataSourceDefinition {
             .addAlternatives("recovery-authentication-context")
             .setAllowExpression(true)
             .setRequired(false)
+            .setRequires(USERNAME_ATTRIBUTE.getName())
             .setRestartAllServices()
             .setValidator(new StringLengthValidator(1))
             .build();
@@ -68,7 +70,7 @@ class XADataSourceDefinition extends AbstractDataSourceDefinition {
             .addAlternatives("recovery-credential-reference")
             .setAllowExpression(true)
             .setRequired(false)
-            .setRequires(USERNAME_ATTRIBUTE.getName())
+            .setRequires(PASSWORD_ATTRIBUTE.getName())
             .setRestartAllServices()
             .setValidator(new StringLengthValidator(1))
             .build();
