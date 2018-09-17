@@ -4719,12 +4719,6 @@
 
             <dependency>
                 <groupId>org.jboss.narayana.jta</groupId>
-                <artifactId>narayana-jta</artifactId>
-                <version>${version.org.jboss.narayana}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jboss.narayana.jta</groupId>
                 <artifactId>narayana-jta-integration</artifactId>
                 <version>${version.org.jboss.narayana}</version>
             </dependency>
