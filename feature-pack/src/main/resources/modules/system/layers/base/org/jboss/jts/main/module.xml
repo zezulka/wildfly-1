@@ -28,30 +28,25 @@
     </properties>
 
     <resources>
-        <artifact name="${org.jboss.narayana.jts:narayana-jts-idlj}"/>
+        <artifact name="${org.jboss.narayana.jts:jts}"/>
+        <artifact name="${org.jboss.narayana.jts:orbportability}"/>
+        <artifact name="${org.jboss.narayana.jts:idlj-idl}"/>
+        <artifact name="${org.jboss.narayana.jts:jtax}"/>
     </resources>
 
     <dependencies>
+        <module name="org.jboss.jta" export="true"/>
+        <module name="org.jboss.jta.cdi" export="true"/>
+        <module name="javax.transaction.api"/>
+        <module name="org.jboss.jboss-transaction-spi"/>
+
         <module name="sun.jdk"/>
         <module name="org.omg.api" />
-        <module name="org.apache.commons.logging"/>
         <module name="org.jboss.logging"/>
-        <module name="org.jboss.jts.integration"/>
-        <module name="org.jboss.jboss-transaction-spi"/>
         <module name="javax.api"/>
-        <module name="javax.transaction.api"/>
         <module name="javax.resource.api"/>
         <module name="org.apache.activemq.artemis.journal"/>
         <module name="javax.orb.api"/>
         <module name="javax.enterprise.api"/>
-        <module name="org.jboss.weld.core"/>
-        <module name="javax.annotation.api" export="true" />
-        <module name="javax.interceptor.api" export="true" />
-        <module name="org.wildfly.transaction.client"/>
-        <module name="org.jboss.as.transactions">
-            <imports>
-                <include path="org.jboss.as.txn.integration"/>
-            </imports>
-        </module>
     </dependencies>
 </module>
