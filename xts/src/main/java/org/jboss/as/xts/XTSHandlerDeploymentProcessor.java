@@ -31,6 +31,7 @@ import org.jboss.as.xts.jandex.CompensatableAnnotation;
 import org.jboss.as.xts.jandex.EndpointMetaData;
 import org.jboss.as.xts.jandex.OldCompensatableAnnotation;
 import org.jboss.as.xts.jandex.TransactionalAnnotation;
+import org.jboss.as.xts.txnclient.WildflyTransactionClientTxBridgeIntegrationHandler;
 import org.jboss.as.webservices.injection.WSEndpointHandlersMapping;
 import org.jboss.as.webservices.util.ASHelper;
 import org.jboss.as.webservices.util.WSAttachmentKeys;
@@ -93,6 +94,7 @@ public class XTSHandlerDeploymentProcessor implements DeploymentUnitProcessor {
             final List<String> handlers = new ArrayList<String>();
 
             if (endpointMetaData.isBridgeEnabled()) {
+                handlers.add(WildflyTransactionClientTxBridgeIntegrationHandler.class.getName());
                 handlers.add(TX_BRIDGE_HANDLER);
             }
             handlers.add(TX_CONTEXT_HANDLER);
