@@ -30,9 +30,12 @@
     </resources>
 
     <dependencies>
-        <module name="javax.transaction.api"/>
+        <module name="javax.transaction.api" />
+        <module name="org.jboss.jta"/>
+        <module name="org.jboss.jta.integration"/>
+
+        <module name="org.jboss.logging" />
         <module name="javax.resource.api"/>
-        <module name="org.jboss.jts"/>
         <module name="org.jboss.ws.api" services="export"/>
         <module name="org.jboss.ws.jaxws-client" services="export"/>
         <module name="org.jboss.ws.cxf.jbossws-cxf-client" services="export"/>
@@ -53,15 +56,10 @@
         <!-- this is needed to ensure the JaxWS endpoint classes canb refer to HttpServletRequest etc -->
         <module name="javax.servlet.api"/>
         <module name="javax.ejb.api" />
-        <module name="org.jboss.jts" />
         <module name="javax.xml.ws.api" />
         <module name="org.jboss.weld.api" />
         <module name="org.jboss.weld.core" />
         <module name="javax.enterprise.api"/>
-        <module name="javax.transaction.api" />
-        <module name="org.jboss.logging" />
-        <module name="org.jboss.narayana.compensations" export="true" />
-        <module name="org.jboss.narayana.txframework" export="true" />
         <module name="javax.annotation.api"  export="true" />
         <module name="javax.interceptor.api"  export="true" />
         <module name="org.jboss.weld.spi" />

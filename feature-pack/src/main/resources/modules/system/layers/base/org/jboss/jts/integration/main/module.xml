@@ -34,8 +34,8 @@
     <dependencies>
         <module name="javax.transaction.api"/>
         <module name="org.jboss.jboss-transaction-spi"/>
+        <module name="org.jboss.jts.self"/>
         <module name="org.jboss.jta"/>
-        <module name="org.jboss.jts"/>
         <module name="org.jboss.jta.integration" export="true"/>
 
         <module name="org.omg.api" />

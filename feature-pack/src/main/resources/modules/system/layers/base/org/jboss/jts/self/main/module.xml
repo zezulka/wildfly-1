@@ -22,34 +22,30 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.5" name="org.jboss.as.jacorb">
+<module xmlns="urn:jboss:module:1.5" name="org.jboss.jts.self">
     <properties>
         <property name="jboss.api" value="private"/>
     </properties>
 
-    <exports>
-        <exclude path="org/jboss/as/jacorb/logging"/>
-    </exports>
-
     <resources>
-        <artifact name="${org.wildfly:wildfly-jacorb}"/>
+        <artifact name="${org.jboss.narayana.jts:jts}"/>
+        <artifact name="${org.jboss.narayana.jts:orbportability}"/>
+        <artifact name="${org.jboss.narayana.jts:idlj-idl}"/>
+        <artifact name="${org.jboss.narayana.jts:jtax}"/>
     </resources>
 
     <dependencies>
-        <module name="javax.api"/>
-        <module name="javax.rmi.api"/>
-        <module name="org.jboss.as.controller"/>
-        <module name="org.jboss.as.naming"/>
-        <module name="org.jboss.as.network"/>
-        <module name="org.wildfly.security.elytron-private"/>
-        <module name="org.jboss.as.server"/>
+        <module name="org.jboss.jta"/>
+        <module name="javax.transaction.api"/>
+        <module name="org.jboss.jboss-transaction-spi"/>
+
+        <module name="sun.jdk"/>
+        <module name="org.omg.api" />
         <module name="org.jboss.logging"/>
-        <module name="org.jboss.metadata.common"/>
-        <module name="org.jboss.metadata.ejb"/>
-        <module name="org.jboss.modules"/>
-        <module name="org.jboss.msc"/>
-        <module name="org.jboss.staxmapper"/>
-        <module name="org.picketbox"/>
-        <module name="org.wildfly.iiop-openjdk"/>
+        <module name="javax.api"/>
+        <module name="javax.resource.api"/>
+        <module name="org.apache.activemq.artemis.journal"/>
+        <module name="javax.orb.api"/>
+        <module name="javax.enterprise.api"/>
     </dependencies>
 </module>
