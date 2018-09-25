@@ -24,7 +24,6 @@ package org.jboss.as.test.integration.messaging.jms.context.auxiliary;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionManagementType.CONTAINER;
-import static org.jboss.as.test.integration.messaging.jms.context.InjectedJMSContextTestCase.QUEUE_NAME;
 
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
@@ -44,7 +43,7 @@ import javax.jms.TextMessage;
  * @author <a href="http://jmesnil.net/">Jeff Mesnil</a> (c) 2013 Red Hat inc.
  */
 @JMSDestinationDefinition(
-        name = QUEUE_NAME,
+        name = TransactedMDB.QUEUE_NAME,
         interfaceName = "javax.jms.Queue",
         destinationName = "InjectedJMSContextTestCaseQueue"
 )
@@ -52,12 +51,13 @@ import javax.jms.TextMessage;
         name = "TransactedMDB",
         activationConfig = {
                 @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-                @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = QUEUE_NAME)
+                @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = TransactedMDB.QUEUE_NAME)
         }
 )
 @TransactionManagement(value = CONTAINER)
 @TransactionAttribute(value = REQUIRED)
 public class TransactedMDB implements MessageListener {
+    public static final String QUEUE_NAME = "java:/InjectedJMSContextTestCaseQueue";
 
     @Inject
     private JMSContext context;

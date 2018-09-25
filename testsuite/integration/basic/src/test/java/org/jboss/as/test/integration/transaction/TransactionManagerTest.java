@@ -56,7 +56,7 @@ public class TransactionManagerTest {
 
     @Test
     public void testTransactionSynchronizationRegistryBoundToJndi() throws NamingException {
-        TransactionSynchronizationRegistry tm = (TransactionSynchronizationRegistry)new InitialContext().lookup("java:jboss/TransactionSynchronizationRegistry");
+        TransactionSynchronizationRegistry tm = (TransactionSynchronizationRegistry)new InitialContext().lookup("java:comp/TransactionSynchronizationRegistry");
         Assert.assertNotNull(tm);
     }
 }
