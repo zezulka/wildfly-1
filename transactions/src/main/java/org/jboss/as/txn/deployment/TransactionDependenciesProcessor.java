@@ -29,15 +29,9 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.as.server.deployment.module.ModuleDependency;
 import org.jboss.as.server.deployment.module.ModuleSpecification;
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.DotName;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
-
-import javax.transaction.TransactionScoped;
-import javax.transaction.Transactional;
-import java.util.List;
 
 
 /**
@@ -68,12 +62,7 @@ public class TransactionDependenciesProcessor implements DeploymentUnitProcessor
             return;
         }
 
-        final List<AnnotationInstance> transactionalAnnotations = compositeIndex.getAnnotations(DotName.createSimple(Transactional.class.getName()));
-        final List<AnnotationInstance> transactionScopedAnnotations = compositeIndex.getAnnotations(DotName.createSimple(TransactionScoped.class.getName()));
-
-        if (transactionalAnnotations.size() > 0 || transactionScopedAnnotations.size() > 0) {
-            addJTSModuleDependencyToDeployment(unit);
-        }
+        addJTSModuleDependencyToDeployment(unit);
     }
 
     private void addJTSModuleDependencyToDeployment(DeploymentUnit unit) {
