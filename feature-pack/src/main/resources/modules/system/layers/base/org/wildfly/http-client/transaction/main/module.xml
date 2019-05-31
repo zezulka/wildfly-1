@@ -42,4 +42,9 @@
         <module name="org.jboss.xnio" />
         <module name="org.wildfly.security.elytron"/>
     </dependencies>
+    <provides>
+        <service name="org.wildfly.transaction.client.spi.RemoteTransactionProvider">
+            <with-class name="org.wildfly.httpclient.transaction.HttpRemoteTransactionProvider"/>
+        </service>
+    </provides>
 </module>
