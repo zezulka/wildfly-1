@@ -29,6 +29,7 @@ import org.jboss.msc.value.InjectedValue;
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBeanException;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.utils.Process;
 import com.arjuna.ats.internal.arjuna.utils.UuidProcessId;
 
@@ -65,6 +66,7 @@ public class CoreEnvironmentService implements Service<CoreEnvironmentBean> {
 
         try {
             coreEnvironmentBean.setNodeIdentifier(nodeIdentifier);
+            TxControl.setXANodeName(nodeIdentifier);
         } catch (CoreEnvironmentBeanException e) {
             throw new StartException(e.getCause());
         }
