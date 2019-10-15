@@ -36,6 +36,9 @@ you how to create a cluster, how configure the web container and EJB
 container for clustering, and shows you how to configure load balancing
 and failover
 
+* The link:Kubernetes_Administration_Guide{outfilesuffix}[Kubernetes Administration Guide] shows
+you how to setup WildFly to work on Kubernetes/OpenShift.
+
 [[developer-guides]]
 == Developer Guides
 

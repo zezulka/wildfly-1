@@ -1,0 +1,36 @@
+[[Kubernetes_Administration_Guide]]
+= Kubernetes Administration Guide
+WildFly developer team;
+:revnumber: {version}
+:revdate: {localdate}
+:toc: macro
+:toclevels: 2
+:toc-title: Kubernetes Administration Guide
+:doctype: book
+:icons: font
+:source-highlighter: coderay
+:wildflyVersion: 14
+:sectlinks:
+:idseparator: -
+:include-depth: 2
+
+ifdef::env-github[:outfilesuffix: .adoc]
+
+
+ifndef::ebook-format[:leveloffset: 1]
+
+(C) 2019 The original authors.
+
+ifdef::basebackend-html[toc::[]]
+
+:numbered:
+
+
+////
+:leveloffset: 1
+////
+
+
+
+include::_kubernetes-administration/EJB-Remoting-Setup.adoc[]
+
