@@ -387,7 +387,7 @@
         <version.org.jboss.logmanager.commons-logging-jboss-logmanager>1.0.3.Final</version.org.jboss.logmanager.commons-logging-jboss-logmanager>
         <version.org.jboss.metadata>13.0.0.Final</version.org.jboss.metadata>
         <version.org.jboss.mod_cluster>1.4.1.Final</version.org.jboss.mod_cluster>
-        <version.org.jboss.narayana>5.10.5.Final</version.org.jboss.narayana>
+        <version.org.jboss.narayana>5.10.6.Final-SNAPSHOT</version.org.jboss.narayana>
         <version.org.jboss.openjdk-orb>8.1.4.Final</version.org.jboss.openjdk-orb>
         <version.org.jboss.resteasy>3.12.1.Final</version.org.jboss.resteasy>
         <version.org.jboss.seam.int>7.0.0.GA</version.org.jboss.seam.int>
@@ -446,7 +446,7 @@
         <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
         <version.org.wildfly.http-client>1.0.21.Final</version.org.wildfly.http-client>
         <version.org.wildfly.naming-client>1.0.13.Final</version.org.wildfly.naming-client>
-        <version.org.wildfly.transaction.client>1.1.11.Final</version.org.wildfly.transaction.client>
+        <version.org.wildfly.transaction.client>1.2.0.Final-SNAPSHOT</version.org.wildfly.transaction.client>
         <version.org.yaml.snakeyaml>1.26</version.org.yaml.snakeyaml>
         <version.rhino.js>1.7R2</version.rhino.js>
         <version.sun.jaxb>2.3.3-b02</version.sun.jaxb>
