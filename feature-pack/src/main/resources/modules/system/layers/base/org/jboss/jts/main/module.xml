@@ -55,5 +55,10 @@
 
         <!-- For the ContextPropagationAsyncHandler used with the context propagation feature pack -->
         <module name="org.wildfly.reactive.dep.jts" services="import" optional="true"/>
+
+        <!-- For OpenTracing -->
+        <module name="io.opentracing.opentracing-api" optional="true"/>
+        <module name="io.opentracing.opentracing-util" optional="true"/>
+
     </dependencies>
 </module>

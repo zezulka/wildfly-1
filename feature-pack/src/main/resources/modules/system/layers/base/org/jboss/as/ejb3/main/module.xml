@@ -114,5 +114,9 @@
         <module name="org.jboss.as.weld.common" optional="true"/>
         <module name="org.hibernate.validator" optional="true"/>
         <module name="org.hibernate.validator.cdi" optional="true"/>
+
+        <!-- For OpenTracing -->
+        <module name="io.opentracing.opentracing-api" optional="true"/>
+        <module name="io.opentracing.opentracing-util" optional="true"/>
     </dependencies>
 </module>

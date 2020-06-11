@@ -44,5 +44,9 @@
         <module name="javax.transaction.api"/>
 
         <module name="org.jboss.modules"/>
+
+        <!-- For OpenTracing -->
+        <module name="io.opentracing.opentracing-api" optional="true"/>
+        <module name="io.opentracing.opentracing-util" optional="true"/>
     </dependencies>
 </module>
