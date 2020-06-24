@@ -897,6 +897,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.narayana.txframework</groupId>
+            <artifactId>txframework</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.narayana.tracing</groupId>
+            <artifactId>narayanatracing</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-ejb-client</artifactId>
             <exclusions>
