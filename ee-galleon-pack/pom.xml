@@ -1338,6 +1338,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.narayana.tracing</groupId>
+            <artifactId>narayanatracing</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.metadata</groupId>
             <artifactId>jboss-metadata-appclient</artifactId>
             <exclusions>
